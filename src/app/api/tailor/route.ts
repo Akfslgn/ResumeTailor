@@ -76,6 +76,7 @@ Tailoring rules:
   The summary must sound like a real human wrote it — direct, confident, specific.
   STRICTLY FORBIDDEN words/phrases in the summary: "passionate", "driven", "results-oriented", "leverage", "leveraging", "spearhead", "innovative", "cutting-edge", "drive innovation", "committed to", "dedicated to", "seeking to", "dynamic", "synergy", "game-changing", "transformative", "best practices", "strong background in", "proven track record".
   Instead use concrete facts: years of experience, specific technologies, real outcomes.
+  When stating years of experience, SUM ALL positions in the resume (including freelance / teaching / all roles). Do NOT count only the most recent job.
 - Aggressively rewrite weak or vague bullet points into strong, specific, impact-driven statements.
   Remove filler phrases like "contributing to", "ensuring", "fostering", "laying a strong foundation", "in order to", "to drive", "passionate about".
   FORBIDDEN words in bullets: "leverage", "leveraging", "spearhead", "innovative", "cutting-edge", "committed to", "dedicated to", "dynamic", "synergy", "best practices".
