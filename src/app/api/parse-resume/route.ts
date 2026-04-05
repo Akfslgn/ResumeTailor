@@ -41,23 +41,9 @@ export async function POST(req: NextRequest) {
     let text = "";
 
     if (file.type === "application/pdf") {
-      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs" as string);
-      // Disable worker for server-side usage
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (pdfjsLib as any).GlobalWorkerOptions.workerSrc = "";
-      const data = new Uint8Array(buffer);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const loadingTask = (pdfjsLib as any).getDocument({ data });
-      const pdfDoc = await loadingTask.promise;
-      const pages: string[] = [];
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        const page = await pdfDoc.getPage(i);
-        const content = await page.getTextContent();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const pageText = content.items.map((item: any) => item.str ?? "").join(" ");
-        pages.push(pageText);
-      }
-      text = pages.join("\n");
+      const { extractText } = await import("unpdf");
+      const { text: pages } = await extractText(new Uint8Array(buffer), { mergePages: true });
+      text = Array.isArray(pages) ? pages.join("\n") : (pages as string);
     } else if (
       file.type ===
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
