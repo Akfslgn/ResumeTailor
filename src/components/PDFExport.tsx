@@ -14,131 +14,38 @@ import { useState } from "react";
 import { Resume } from "@/types/resume";
 import { Download, Pencil, Check } from "lucide-react";
 
-Font.register({
-  family: "Times",
-  fonts: [
-    {
-      src: "https://fonts.gstatic.com/s/timesnewroman/v1/stub-placeholder.ttf",
-    },
-  ],
-});
+function makeStyles(font: "serif" | "sans") {
+  const base = font === "serif" ? "Times-Roman" : "Helvetica";
+  const bold = font === "serif" ? "Times-Bold" : "Helvetica-Bold";
+  return StyleSheet.create({
+    page: { padding: 40, fontSize: 10, fontFamily: base, color: "#111111", lineHeight: 1.4 },
+    header: { textAlign: "center", marginBottom: 10, borderBottomWidth: 1.5, borderBottomColor: "#111111", paddingBottom: 8 },
+    name: { fontSize: 20, fontFamily: bold, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 },
+    contactRow: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 6, fontSize: 9, color: "#444444", marginTop: 8 },
+    contactItem: { marginHorizontal: 4 },
+    sectionTitle: { fontSize: 8, fontFamily: bold, textTransform: "uppercase", letterSpacing: 2, borderBottomWidth: 0.5, borderBottomColor: "#888888", paddingBottom: 2, marginTop: 10, marginBottom: 4, color: "#333333" },
+    skillRow: { flexDirection: "row", marginBottom: 2 },
+    skillLabel: { fontFamily: bold, marginRight: 4, minWidth: 100 },
+    expHeader: { flexDirection: "row", justifyContent: "space-between", marginBottom: 1 },
+    expTitle: { fontFamily: bold },
+    expCompany: { color: "#444444" },
+    expDate: { fontSize: 9, color: "#666666" },
+    expLocation: { fontSize: 9, color: "#888888", marginBottom: 2 },
+    bullet: { flexDirection: "row", marginBottom: 1, paddingLeft: 8 },
+    bulletDot: { marginRight: 4, marginTop: 1 },
+    bulletText: { flex: 1, color: "#333333" },
+    projectHeader: { flexDirection: "row", justifyContent: "space-between" },
+    projectName: { fontFamily: bold },
+    projectUrl: { fontSize: 9, color: "#666666" },
+    projectDesc: { color: "#333333", marginTop: 1 },
+    projectTech: { fontSize: 9, color: "#666666", marginTop: 1 },
+    eduRow: { flexDirection: "row", justifyContent: "space-between" },
+    mb3: { marginBottom: 4 },
+  });
+}
 
-const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontSize: 10,
-    fontFamily: "Helvetica",
-    color: "#111111",
-    lineHeight: 1.4,
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: 10,
-    borderBottomWidth: 1.5,
-    borderBottomColor: "#111111",
-    paddingBottom: 8,
-  },
-  name: {
-    fontSize: 20,
-    fontFamily: "Helvetica-Bold",
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-    marginBottom: 4,
-  },
-  contactRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 6,
-    fontSize: 9,
-    color: "#444444",
-    marginTop: 8,
-  },
-  contactItem: {
-    marginHorizontal: 4,
-  },
-  sectionTitle: {
-    fontSize: 8,
-    fontFamily: "Helvetica-Bold",
-    textTransform: "uppercase",
-    letterSpacing: 2,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#888888",
-    paddingBottom: 2,
-    marginTop: 10,
-    marginBottom: 4,
-    color: "#333333",
-  },
-  skillRow: {
-    flexDirection: "row",
-    marginBottom: 2,
-  },
-  skillLabel: {
-    fontFamily: "Helvetica-Bold",
-    marginRight: 4,
-    minWidth: 100,
-  },
-  expHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 1,
-  },
-  expTitle: {
-    fontFamily: "Helvetica-Bold",
-  },
-  expCompany: {
-    color: "#444444",
-  },
-  expDate: {
-    fontSize: 9,
-    color: "#666666",
-  },
-  expLocation: {
-    fontSize: 9,
-    color: "#888888",
-    marginBottom: 2,
-  },
-  bullet: {
-    flexDirection: "row",
-    marginBottom: 1,
-    paddingLeft: 8,
-  },
-  bulletDot: {
-    marginRight: 4,
-    marginTop: 1,
-  },
-  bulletText: {
-    flex: 1,
-    color: "#333333",
-  },
-  projectHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  projectName: {
-    fontFamily: "Helvetica-Bold",
-  },
-  projectUrl: {
-    fontSize: 9,
-    color: "#666666",
-  },
-  projectDesc: {
-    color: "#333333",
-    marginTop: 1,
-  },
-  projectTech: {
-    fontSize: 9,
-    color: "#666666",
-    marginTop: 1,
-  },
-  eduRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  mb3: { marginBottom: 4 },
-});
-
-function ResumePDFDoc({ resume }: { resume: Resume }) {
+function ResumePDFDoc({ resume, fontStyle = "serif" }: { resume: Resume; fontStyle?: "serif" | "sans" }) {
+  const styles = makeStyles(fontStyle);
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -272,7 +179,7 @@ function ResumePDFDoc({ resume }: { resume: Resume }) {
   );
 }
 
-export default function PDFExportButton({ resume }: { resume: Resume }) {
+export default function PDFExportButton({ resume, fontStyle = "serif" }: { resume: Resume; fontStyle?: "serif" | "sans" }) {
   const defaultName = `${resume.name.replace(/\s+/g, "_")}_Resume`;
   const [basename, setBasename] = useState(defaultName);
   const [editing, setEditing] = useState(false);
@@ -331,7 +238,7 @@ export default function PDFExportButton({ resume }: { resume: Resume }) {
 
       {/* Download button */}
       <PDFDownloadLink
-        document={<ResumePDFDoc resume={resume} />}
+        document={<ResumePDFDoc resume={resume} fontStyle={fontStyle} />}
         fileName={filename}
       >
         {({ loading }) => (

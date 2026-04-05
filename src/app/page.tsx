@@ -66,6 +66,10 @@ export default function Home() {
   );
   const [parsing, setParsing] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [fontStyle, setFontStyle] = useState<"serif" | "sans">(() => {
+    if (typeof window === "undefined") return "serif";
+    return (localStorage.getItem("rt_font") as "serif" | "sans") ?? "serif";
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Persist to localStorage on change
@@ -87,6 +91,9 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem("rt_fileName", uploadedFileName ?? "");
   }, [uploadedFileName]);
+  useEffect(() => {
+    localStorage.setItem("rt_font", fontStyle);
+  }, [fontStyle]);
 
   const displayedResume =
     activeTab === "tailored" && tailoredResume
@@ -425,7 +432,25 @@ export default function Home() {
                 onClick={() => tailoredResume && setActiveTab("tailored")}
               />
             </div>
-            {displayedResume && <PDFExport resume={displayedResume} />}
+            <div className="flex items-center gap-2">
+              <div className="flex gap-0.5 bg-slate-300 rounded-lg p-1">
+                <button
+                  onClick={() => setFontStyle("serif")}
+                  className={`px-2.5 py-1 text-xs rounded-md transition-colors ${fontStyle === "serif" ? "bg-white text-slate-800 shadow-sm font-medium" : "text-slate-500 hover:text-slate-700"}`}
+                  style={{ fontFamily: "Georgia, serif" }}
+                >
+                  Serif
+                </button>
+                <button
+                  onClick={() => setFontStyle("sans")}
+                  className={`px-2.5 py-1 text-xs rounded-md transition-colors ${fontStyle === "sans" ? "bg-white text-slate-800 shadow-sm font-medium" : "text-slate-500 hover:text-slate-700"}`}
+                  style={{ fontFamily: "Arial, sans-serif" }}
+                >
+                  Sans
+                </button>
+              </div>
+              {displayedResume && <PDFExport resume={displayedResume} fontStyle={fontStyle} />}
+            </div>
           </div>
 
           {/* Content */}
@@ -454,8 +479,7 @@ export default function Home() {
             ) : (
               displayedResume && (
                 <ResumePreview
-                  resume={displayedResume}
-                  onUpdate={(updated) => {
+                  resume={displayedResume}                  fontStyle={fontStyle}                  onUpdate={(updated) => {
                     if (activeTab === "tailored") {
                       setTailoredResume(updated);
                     } else {

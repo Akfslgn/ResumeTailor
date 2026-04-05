@@ -6,14 +6,16 @@ import { Resume } from "@/types/resume";
 interface Props {
   resume: Resume;
   onUpdate?: (updated: Resume) => void;
+  fontStyle?: "serif" | "sans";
 }
 
-export default function ResumePreview({ resume, onUpdate }: Props) {
+export default function ResumePreview({ resume, onUpdate, fontStyle = "serif" }: Props) {
+  const fontFamily = fontStyle === "sans" ? "Arial, Helvetica, sans-serif" : "Georgia, serif";
   return (
     <div
       id="resume-preview"
-      className="bg-white text-gray-900 p-8 font-sans text-sm leading-relaxed max-w-[800px] mx-auto shadow-lg"
-      style={{ fontFamily: "Georgia, serif" }}
+      className="bg-white text-gray-900 p-8 text-sm leading-relaxed max-w-[800px] mx-auto shadow-lg"
+      style={{ fontFamily }}
     >
       {/* Header */}
       <div className="text-center border-b-2 border-gray-800 pb-4 mb-4">
