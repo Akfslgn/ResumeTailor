@@ -89,7 +89,14 @@ export default function ResumePreview({ resume }: Props) {
               <div className="flex justify-between items-baseline">
                 <span className="font-bold text-gray-900">{proj.name}</span>
                 {proj.url && (
-                  <span className="text-xs text-gray-500">{proj.url}</span>
+                  <a
+                    href={proj.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 hover:underline"
+                  >
+                    {proj.url}
+                  </a>
                 )}
               </div>
               <p className="text-gray-700 mb-0.5">{proj.description}</p>

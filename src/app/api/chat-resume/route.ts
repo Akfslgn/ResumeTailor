@@ -16,7 +16,10 @@ const RESUME_SCHEMA = `{
   projects: [{ name, description, technologies[], url? }]
 }
 
-For skills, use whatever category names make sense (e.g. Frontend, Backend, Database, Tools, Deployment). Each key maps to an array of skill strings.`;
+IMPORTANT field names:
+- Project links MUST go in the "url" field (not "link", not "website", not "projectUrl" — only "url")
+- Skills use flexible category names (e.g. Frontend, Backend, Database, Tools, Deployment)
+- Each skill category maps to an array of skill strings`;
 
 export async function POST(req: NextRequest) {
   try {
