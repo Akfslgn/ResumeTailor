@@ -326,7 +326,6 @@ function EBlock({ value, onSave }: { value: string; onSave?: (v: string) => void
             title="Bold selected text (Ctrl+B)"
             className="px-2 py-0.5 text-xs font-bold border border-gray-300 rounded hover:bg-gray-100 text-gray-700"
           >B</button>
-          <span className="text-xs text-gray-400">Metni seçip B'ye tıkla</span>
         </div>
         <textarea
           ref={taRef}
