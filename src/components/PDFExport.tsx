@@ -177,35 +177,13 @@ function ResumePDFDoc({ resume }: { resume: Resume }) {
         {/* Skills */}
         <View>
           <Text style={styles.sectionTitle}>Technical Skills</Text>
-          {resume.skills.languages?.length > 0 && (
-            <View style={styles.skillRow}>
-              <Text style={styles.skillLabel}>Languages:</Text>
-              <Text>{resume.skills.languages.join(", ")}</Text>
-            </View>
-          )}
-          {resume.skills.frameworks?.length > 0 && (
-            <View style={styles.skillRow}>
-              <Text style={styles.skillLabel}>Frameworks:</Text>
-              <Text>{resume.skills.frameworks.join(", ")}</Text>
-            </View>
-          )}
-          {resume.skills.databases?.length > 0 && (
-            <View style={styles.skillRow}>
-              <Text style={styles.skillLabel}>Databases:</Text>
-              <Text>{resume.skills.databases.join(", ")}</Text>
-            </View>
-          )}
-          {resume.skills.tools?.length > 0 && (
-            <View style={styles.skillRow}>
-              <Text style={styles.skillLabel}>Tools:</Text>
-              <Text>{resume.skills.tools.join(", ")}</Text>
-            </View>
-          )}
-          {resume.skills.cloud?.length > 0 && (
-            <View style={styles.skillRow}>
-              <Text style={styles.skillLabel}>Cloud & DevOps:</Text>
-              <Text>{resume.skills.cloud.join(", ")}</Text>
-            </View>
+          {Object.entries(resume.skills).map(([label, items]) =>
+            items?.length > 0 ? (
+              <View key={label} style={styles.skillRow}>
+                <Text style={styles.skillLabel}>{label}:</Text>
+                <Text>{items.join(", ")}</Text>
+              </View>
+            ) : null
           )}
         </View>
 

@@ -31,13 +31,7 @@ export interface Resume {
   github?: string;
   website?: string;
   summary: string;
-  skills: {
-    languages: string[];
-    frameworks: string[];
-    tools: string[];
-    databases: string[];
-    cloud: string[];
-  };
+  skills: Record<string, string[]>;
   experience: ResumeExperience[];
   education: ResumeEducation[];
   projects: ResumeProject[];

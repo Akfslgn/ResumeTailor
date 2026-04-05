@@ -10,11 +10,13 @@ export interface ChatMessage {
 const RESUME_SCHEMA = `{
   name, email, phone, location, linkedin?, github?, website?,
   summary,
-  skills: { languages[], frameworks[], tools[], databases[], cloud[] },
+  skills: { "Category Name": ["skill1", "skill2"], ... },
   experience: [{ company, title, location, startDate, endDate, bullets[] }],
   education: [{ school, degree, field, graduationDate, gpa? }],
   projects: [{ name, description, technologies[], url? }]
-}`;
+}
+
+For skills, use whatever category names make sense (e.g. Frontend, Backend, Database, Tools, Deployment). Each key maps to an array of skill strings.`;
 
 export async function POST(req: NextRequest) {
   try {

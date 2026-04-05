@@ -5,11 +5,13 @@ import { Resume } from "@/types/resume";
 const RESUME_SCHEMA = `{
   name, email, phone, location, linkedin?, github?, website?,
   summary,
-  skills: { languages[], frameworks[], tools[], databases[], cloud[] },
+  skills: { "Category Name": ["skill1", "skill2"], ... },
   experience: [{ company, title, location, startDate, endDate, bullets[] }],
   education: [{ school, degree, field, graduationDate, gpa? }],
   projects: [{ name, description, technologies[], url? }]
-}`;
+}
+
+For skills, preserve the exact category names from the original resume (e.g. Frontend, Backend, Database). Do not rename them to languages/frameworks/tools.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -138,15 +140,20 @@ Return JSON with "original" and "tailored" keys.`;
           const start = parseDate(job.startDate);
           const end = parseDate(job.endDate);
           if (start && end) {
-            months += (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+            months +=
+              (end.getFullYear() - start.getFullYear()) * 12 +
+              (end.getMonth() - start.getMonth());
           }
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
       }
       return Math.max(1, Math.round(months / 12));
     })();
 
     // Determine role from most recent job title
-    const latestTitle = parsed.original.experience?.[0]?.title ?? "Full Stack Developer";
+    const latestTitle =
+      parsed.original.experience?.[0]?.title ?? "Full Stack Developer";
     const firstSentence = `${latestTitle} — ${totalYears}+ years building web applications.`;
 
     const summaryCompletion = await openai.chat.completions.create({
@@ -192,10 +199,15 @@ Write only the remaining 1-2 sentences.`,
     const summaryRaw = summaryCompletion.choices[0].message.content;
     if (summaryRaw) {
       try {
-        const parsed2 = JSON.parse(summaryRaw) as { rest?: string; summary?: string };
+        const parsed2 = JSON.parse(summaryRaw) as {
+          rest?: string;
+          summary?: string;
+        };
         const rest = parsed2.rest ?? parsed2.summary ?? "";
         if (rest) parsed.tailored.summary = `${firstSentence} ${rest}`;
-      } catch { /* keep original summary if parse fails */ }
+      } catch {
+        /* keep original summary if parse fails */
+      }
     }
 
     return NextResponse.json({

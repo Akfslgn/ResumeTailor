@@ -44,23 +44,10 @@ export default function ResumePreview({ resume }: Props) {
       {/* Skills */}
       <Section title="Technical Skills">
         <div className="grid grid-cols-1 gap-1">
-          {resume.skills.languages?.length > 0 && (
-            <SkillRow label="Languages" items={resume.skills.languages} />
-          )}
-          {resume.skills.frameworks?.length > 0 && (
-            <SkillRow
-              label="Frameworks & Libraries"
-              items={resume.skills.frameworks}
-            />
-          )}
-          {resume.skills.databases?.length > 0 && (
-            <SkillRow label="Databases" items={resume.skills.databases} />
-          )}
-          {resume.skills.tools?.length > 0 && (
-            <SkillRow label="Tools & Platforms" items={resume.skills.tools} />
-          )}
-          {resume.skills.cloud?.length > 0 && (
-            <SkillRow label="Cloud & DevOps" items={resume.skills.cloud} />
+          {Object.entries(resume.skills).map(([label, items]) =>
+            items?.length > 0 ? (
+              <SkillRow key={label} label={label} items={items} />
+            ) : null
           )}
         </div>
       </Section>
