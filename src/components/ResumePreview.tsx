@@ -17,7 +17,8 @@ type AccentColors = { headerBorder: string; sectionBorder: string; sectionText: 
 const AccentCtx = createContext<AccentColors>(ACCENT.black);
 
 // Parse **bold** markers into React nodes
-function parseMarkup(text: string): React.ReactNode {
+function parseMarkup(text: string | undefined | null): React.ReactNode {
+  if (!text) return null;
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   if (parts.length === 1) return text;
   return parts.map((part, i) =>
@@ -28,7 +29,8 @@ function parseMarkup(text: string): React.ReactNode {
 }
 
 // Wrap/unwrap selection in **...**
-function applyFormat(el: HTMLInputElement | HTMLTextAreaElement, draft: string, setDraft: (v: string) => void) {
+function applyFormat(el: HTMLInputElement | HTMLTextAreaElement, draft: string | undefined, setDraft: (v: string) => void) {
+  if (!draft) return;
   const start = el.selectionStart ?? 0;
   const end = el.selectionEnd ?? 0;
   if (start === end) return;
