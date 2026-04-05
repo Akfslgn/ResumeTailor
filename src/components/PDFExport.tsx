@@ -12,40 +12,46 @@ import {
 } from "@react-pdf/renderer";
 import { useState } from "react";
 import { Resume } from "@/types/resume";
+import { ResumeSettings, DEFAULT_SETTINGS, fontSizePt, lineHeightPDF, ACCENT } from "@/types/settings";
 import { Download, Pencil, Check } from "lucide-react";
 
-function makeStyles(font: "serif" | "sans" | "mono") {
+function makeStyles(s: ResumeSettings) {
+  const font = s.fontStyle;
   const base = font === "serif" ? "Times-Roman" : font === "mono" ? "Courier" : "Helvetica";
   const bold = font === "serif" ? "Times-Bold" : font === "mono" ? "Courier-Bold" : "Helvetica-Bold";
+  const fs = fontSizePt(s.fontSize);
+  const lh = lineHeightPDF(s.lineHeight);
+  const ac = ACCENT[s.accentColor];
   return StyleSheet.create({
-    page: { padding: 40, fontSize: 10, fontFamily: base, color: "#111111", lineHeight: 1.4 },
-    header: { textAlign: "center", marginBottom: 10, borderBottomWidth: 1.5, borderBottomColor: "#111111", paddingBottom: 8 },
-    name: { fontSize: 20, fontFamily: bold, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 },
-    contactRow: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 6, fontSize: 9, color: "#444444", marginTop: 8 },
+    page: { padding: 40, fontSize: fs, fontFamily: base, color: "#111111", lineHeight: lh },
+    header: { textAlign: "center", marginBottom: 10, borderBottomWidth: 1.5, borderBottomColor: ac.pdfBorder, paddingBottom: 8 },
+    name: { fontSize: fs * 2, fontFamily: bold, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 },
+    contactRow: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 6, fontSize: fs * 0.9, color: "#444444", marginTop: 8 },
     contactItem: { marginHorizontal: 4 },
-    sectionTitle: { fontSize: 8, fontFamily: bold, textTransform: "uppercase", letterSpacing: 2, borderBottomWidth: 0.5, borderBottomColor: "#888888", paddingBottom: 2, marginTop: 10, marginBottom: 4, color: "#333333" },
+    sectionTitle: { fontSize: fs * 0.8, fontFamily: bold, textTransform: "uppercase", letterSpacing: 2, borderBottomWidth: 0.5, borderBottomColor: ac.pdfBorder, paddingBottom: 2, marginTop: 10, marginBottom: 4, color: ac.pdfTitle },
     skillRow: { flexDirection: "row", marginBottom: 2 },
     skillLabel: { fontFamily: bold, marginRight: 4, minWidth: 100 },
     expHeader: { flexDirection: "row", justifyContent: "space-between", marginBottom: 1 },
     expTitle: { fontFamily: bold },
     expCompany: { color: "#444444" },
-    expDate: { fontSize: 9, color: "#666666" },
-    expLocation: { fontSize: 9, color: "#888888", marginBottom: 2 },
+    expDate: { fontSize: fs * 0.9, color: "#666666" },
+    expLocation: { fontSize: fs * 0.9, color: "#888888", marginBottom: 2 },
     bullet: { flexDirection: "row", marginBottom: 1, paddingLeft: 8 },
     bulletDot: { marginRight: 4, marginTop: 1 },
     bulletText: { flex: 1, color: "#333333" },
     projectHeader: { flexDirection: "row", justifyContent: "space-between" },
     projectName: { fontFamily: bold },
-    projectUrl: { fontSize: 9, color: "#666666" },
+    projectUrl: { fontSize: fs * 0.9, color: "#666666" },
     projectDesc: { color: "#333333", marginTop: 1 },
-    projectTech: { fontSize: 9, color: "#666666", marginTop: 1 },
+    projectTech: { fontSize: fs * 0.9, color: "#666666", marginTop: 1 },
     eduRow: { flexDirection: "row", justifyContent: "space-between" },
+    eduBold: { fontFamily: bold },
     mb3: { marginBottom: 4 },
   });
 }
 
-function ResumePDFDoc({ resume, fontStyle = "serif" }: { resume: Resume; fontStyle?: "serif" | "sans" | "mono" }) {
-  const styles = makeStyles(fontStyle);
+function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume; settings?: ResumeSettings }) {
+  const styles = makeStyles(settings);
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -160,11 +166,8 @@ function ResumePDFDoc({ resume, fontStyle = "serif" }: { resume: Resume; fontSty
             {resume.education.map((ed, i) => (
               <View key={i} style={styles.eduRow}>
                 <Text>
-                  <Text style={{ fontFamily: "Helvetica-Bold" }}>
-                    {ed.school}
-                  </Text>
-                  {" — "}
-                  {ed.degree} in {ed.field}
+                  <Text style={styles.eduBold}>{ed.school}</Text>
+                    {ed.degree} in {ed.field}
                   {ed.gpa ? ` · GPA: ${ed.gpa}` : ""}
                 </Text>
                 <Text style={{ fontSize: 9, color: "#666666" }}>
@@ -179,7 +182,7 @@ function ResumePDFDoc({ resume, fontStyle = "serif" }: { resume: Resume; fontSty
   );
 }
 
-export default function PDFExportButton({ resume, fontStyle = "serif" }: { resume: Resume; fontStyle?: "serif" | "sans" | "mono" }) {
+export default function PDFExportButton({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume; settings?: ResumeSettings }) {
   const defaultName = `${resume.name.replace(/\s+/g, "_")}_Resume`;
   const [basename, setBasename] = useState(defaultName);
   const [editing, setEditing] = useState(false);
@@ -238,7 +241,7 @@ export default function PDFExportButton({ resume, fontStyle = "serif" }: { resum
 
       {/* Download button */}
       <PDFDownloadLink
-        document={<ResumePDFDoc resume={resume} fontStyle={fontStyle} />}
+        document={<ResumePDFDoc resume={resume} settings={settings} />}
         fileName={filename}
       >
         {({ loading }) => (

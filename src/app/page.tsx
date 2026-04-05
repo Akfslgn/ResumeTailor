@@ -11,10 +11,13 @@ import {
   UploadCloud,
   X,
   FileCheck,
+  Settings,
 } from "lucide-react";
 import ResumePreview from "@/components/ResumePreview";
 import ResumeChatPanel from "@/components/ResumeChatPanel";
+import SettingsPanel from "@/components/SettingsPanel";
 import { Resume } from "@/types/resume";
+import { ResumeSettings, DEFAULT_SETTINGS } from "@/types/settings";
 import { EXAMPLE_RESUME, EXAMPLE_JOB_DESCRIPTION } from "@/data/exampleData";
 
 const PDFExport = dynamic(() => import("@/components/PDFExport"), {
@@ -66,9 +69,17 @@ export default function Home() {
   );
   const [parsing, setParsing] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [fontStyle, setFontStyle] = useState<"serif" | "sans" | "mono">(() => {
-    if (typeof window === "undefined") return "serif";
-    return (localStorage.getItem("rt_font") as "serif" | "sans" | "mono") ?? "serif";
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState<ResumeSettings>(() => {
+    if (typeof window === "undefined") return DEFAULT_SETTINGS;
+    try {
+      const stored = localStorage.getItem("rt_settings");
+      if (stored) return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
+      // migrate old rt_font key
+      const oldFont = localStorage.getItem("rt_font") as ResumeSettings["fontStyle"] | null;
+      if (oldFont) return { ...DEFAULT_SETTINGS, fontStyle: oldFont };
+    } catch {}
+    return DEFAULT_SETTINGS;
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -92,8 +103,8 @@ export default function Home() {
     localStorage.setItem("rt_fileName", uploadedFileName ?? "");
   }, [uploadedFileName]);
   useEffect(() => {
-    localStorage.setItem("rt_font", fontStyle);
-  }, [fontStyle]);
+    localStorage.setItem("rt_settings", JSON.stringify(settings));
+  }, [settings]);
 
   const displayedResume =
     activeTab === "tailored" && tailoredResume
@@ -433,30 +444,13 @@ export default function Home() {
               />
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex gap-0.5 bg-slate-300 rounded-lg p-1">
-                <button
-                  onClick={() => setFontStyle("serif")}
-                  className={`px-2.5 py-1 text-xs rounded-md transition-colors ${fontStyle === "serif" ? "bg-white text-slate-800 shadow-sm font-medium" : "text-slate-500 hover:text-slate-700"}`}
-                  style={{ fontFamily: "Georgia, serif" }}
-                >
-                  Serif
-                </button>
-                <button
-                  onClick={() => setFontStyle("sans")}
-                  className={`px-2.5 py-1 text-xs rounded-md transition-colors ${fontStyle === "sans" ? "bg-white text-slate-800 shadow-sm font-medium" : "text-slate-500 hover:text-slate-700"}`}
-                  style={{ fontFamily: "Arial, sans-serif" }}
-                >
-                  Sans
-                </button>
-                <button
-                  onClick={() => setFontStyle("mono")}
-                  className={`px-2.5 py-1 text-xs rounded-md transition-colors ${fontStyle === "mono" ? "bg-white text-slate-800 shadow-sm font-medium" : "text-slate-500 hover:text-slate-700"}`}
-                  style={{ fontFamily: "'Courier New', monospace" }}
-                >
-                  Mono
-                </button>
-              </div>
-              {displayedResume && <PDFExport resume={displayedResume} fontStyle={fontStyle} />}
+              <button
+                onClick={() => setShowSettings(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg transition-colors font-medium"
+              >
+                <Settings size={13} /> Appearance
+              </button>
+              {displayedResume && <PDFExport resume={displayedResume} settings={settings} />}
             </div>
           </div>
 
@@ -486,7 +480,9 @@ export default function Home() {
             ) : (
               displayedResume && (
                 <ResumePreview
-                  resume={displayedResume}                  fontStyle={fontStyle}                  onUpdate={(updated) => {
+                  resume={displayedResume}
+                  settings={settings}
+                  onUpdate={(updated) => {
                     if (activeTab === "tailored") {
                       setTailoredResume(updated);
                     } else {
@@ -499,6 +495,13 @@ export default function Home() {
           </div>
         </div>
       </div>
+      {showSettings && (
+        <SettingsPanel
+          settings={settings}
+          onChange={setSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
     </div>
   );
 }

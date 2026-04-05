@@ -1,196 +1,225 @@
 "use client";
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { Link2, Pencil, Check, X, Plus, Trash2 } from "lucide-react";
 import { Resume } from "@/types/resume";
+import {
+  ResumeSettings, DEFAULT_SETTINGS,
+  fontFamilyCSS, fontSizePx, lineHeightVal, ACCENT,
+} from "@/types/settings";
 
 interface Props {
   resume: Resume;
   onUpdate?: (updated: Resume) => void;
-  fontStyle?: "serif" | "sans" | "mono";
+  settings?: ResumeSettings;
 }
 
-export default function ResumePreview({ resume, onUpdate, fontStyle = "serif" }: Props) {
-  const fontFamily =
-    fontStyle === "sans" ? "Arial, Helvetica, sans-serif"
-    : fontStyle === "mono" ? "'Courier New', Courier, monospace"
-    : "Georgia, serif";
+type AccentColors = { headerBorder: string; sectionBorder: string; sectionText: string; pdfBorder: string; pdfTitle: string };
+const AccentCtx = createContext<AccentColors>(ACCENT.black);
+
+export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SETTINGS }: Props) {
+  const accent = ACCENT[settings.accentColor];
 
   function upd(partial: Partial<Resume>) {
     onUpdate?.({ ...resume, ...partial });
   }
 
   return (
-    <div
-      id="resume-preview"
-      className="bg-white text-gray-900 p-8 text-sm leading-relaxed max-w-[800px] mx-auto shadow-lg"
-      style={{ fontFamily }}
-    >
-      {/* Header */}
-      <div className="text-center border-b-2 border-gray-800 pb-4 mb-4">
-        <h1 className="text-3xl font-bold tracking-wide uppercase text-gray-900">
-          <E value={resume.name} bold onSave={onUpdate ? (v) => upd({ name: v }) : undefined} />
-        </h1>
-        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4 text-xs text-gray-600">
-          <E value={resume.email} onSave={onUpdate ? (v) => upd({ email: v }) : undefined} />
-          <E value={resume.phone} onSave={onUpdate ? (v) => upd({ phone: v }) : undefined} />
-          <E value={resume.location} onSave={onUpdate ? (v) => upd({ location: v }) : undefined} />
-          {resume.linkedin && (
-            <E value={resume.linkedin} onSave={onUpdate ? (v) => upd({ linkedin: v }) : undefined} />
-          )}
-          {resume.github && (
-            <E value={resume.github} onSave={onUpdate ? (v) => upd({ github: v }) : undefined} />
-          )}
-          {resume.website && (
-            <E value={resume.website} onSave={onUpdate ? (v) => upd({ website: v }) : undefined} />
-          )}
+    <AccentCtx.Provider value={accent}>
+      <div
+        id="resume-preview"
+        className="bg-white text-gray-900 p-8 max-w-[800px] mx-auto shadow-lg"
+        style={{
+          fontFamily: fontFamilyCSS(settings.fontStyle),
+          fontSize: fontSizePx(settings.fontSize),
+          lineHeight: lineHeightVal(settings.lineHeight),
+        }}
+      >
+        {/* Header */}
+        <div
+          className="text-center pb-4 mb-4 border-b-2"
+          style={{ borderColor: accent.headerBorder }}
+        >
+          <h1 className="text-3xl font-bold tracking-wide uppercase text-gray-900">
+            <E value={resume.name} bold onSave={onUpdate ? (v) => upd({ name: v }) : undefined} />
+          </h1>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4 text-xs text-gray-600">
+            <E value={resume.email} onSave={onUpdate ? (v) => upd({ email: v }) : undefined} />
+            <E value={resume.phone} onSave={onUpdate ? (v) => upd({ phone: v }) : undefined} />
+            <E value={resume.location} onSave={onUpdate ? (v) => upd({ location: v }) : undefined} />
+            {resume.linkedin && (
+              <E value={resume.linkedin} onSave={onUpdate ? (v) => upd({ linkedin: v }) : undefined} />
+            )}
+            {resume.github && (
+              <E value={resume.github} onSave={onUpdate ? (v) => upd({ github: v }) : undefined} />
+            )}
+            {resume.website && (
+              <E value={resume.website} onSave={onUpdate ? (v) => upd({ website: v }) : undefined} />
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Summary */}
-      {resume.summary && (
-        <Section title="Professional Summary">
-          <EBlock value={resume.summary} onSave={onUpdate ? (v) => upd({ summary: v }) : undefined} />
-        </Section>
-      )}
+        {/* Summary */}
+        {resume.summary && (
+          <Section title="Professional Summary">
+            <EBlock value={resume.summary} onSave={onUpdate ? (v) => upd({ summary: v }) : undefined} />
+          </Section>
+        )}
 
-      {/* Skills */}
-      <Section title="Technical Skills">
-        <div className="grid grid-cols-1 gap-1">
-          {Object.entries(resume.skills).map(([label, items]) =>
-            items?.length > 0 ? (
-              <EditableSkillRow
-                key={label}
-                label={label}
-                items={items}
-                onSave={onUpdate ? (newLabel, newItems) => {
-                  const newSkills: Record<string, string[]> = {};
-                  for (const [k, v] of Object.entries(resume.skills)) {
-                    newSkills[k === label ? newLabel : k] = v;
-                  }
-                  newSkills[newLabel] = newItems;
-                  upd({ skills: newSkills });
-                } : undefined}
-              />
-            ) : null
-          )}
-        </div>
-      </Section>
-
-      {/* Experience */}
-      {resume.experience?.length > 0 && (
-        <Section title="Professional Experience">
-          {resume.experience.map((exp, i) => (
-            <div key={i} className="mb-4">
-              <div className="flex justify-between items-start gap-2">
-                <div className="flex flex-wrap items-baseline gap-x-1">
-                  <E value={exp.title} bold onSave={onUpdate ? (v) => {
-                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, title: v } : e) });
-                  } : undefined} />
-                  <span className="text-gray-500"> — </span>
-                  <E value={exp.company} onSave={onUpdate ? (v) => {
-                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, company: v } : e) });
-                  } : undefined} />
-                </div>
-                <div className="text-xs text-gray-500 whitespace-nowrap flex items-center gap-1 flex-shrink-0">
-                  <E value={exp.startDate} small onSave={onUpdate ? (v) => {
-                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, startDate: v } : e) });
-                  } : undefined} />
-                  <span>–</span>
-                  <E value={exp.endDate} small onSave={onUpdate ? (v) => {
-                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, endDate: v } : e) });
-                  } : undefined} />
-                </div>
-              </div>
-              {exp.location && (
-                <div className="mt-0.5">
-                  <E value={exp.location} small muted onSave={onUpdate ? (v) => {
-                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, location: v } : e) });
-                  } : undefined} />
-                </div>
-              )}
-              <ul className="list-disc list-outside ml-4 space-y-0.5 mt-1">
-                {exp.bullets.map((b, j) => (
-                  <li key={j} className="text-gray-700">
-                    <E value={b} wide onSave={onUpdate ? (v) => {
-                      const bullets = exp.bullets.map((x, k) => k === j ? v : x);
-                      upd({ experience: resume.experience.map((e, k) => k === i ? { ...e, bullets } : e) });
-                    } : undefined} onDelete={onUpdate ? () => {
-                      const bullets = exp.bullets.filter((_, k) => k !== j);
-                      upd({ experience: resume.experience.map((e, k) => k === i ? { ...e, bullets } : e) });
-                    } : undefined} />
-                  </li>
-                ))}
-                {onUpdate && (
-                  <li className="list-none ml-[-1rem]">
-                    <button
-                      onClick={() => {
-                        const bullets = [...exp.bullets, "New bullet point"];
-                        upd({ experience: resume.experience.map((e, k) => k === i ? { ...e, bullets } : e) });
-                      }}
-                      className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-0.5"
-                    >
-                      <Plus size={11} /> Add bullet
-                    </button>
-                  </li>
-                )}
-              </ul>
-            </div>
-          ))}
-        </Section>
-      )}
-
-      {/* Projects */}
-      {resume.projects?.length > 0 && (
-        <Section title="Projects">
-          {resume.projects.map((proj, i) => (
-            <div key={i} className="mb-3">
-              <div className="flex justify-between items-start gap-2">
-                <E value={proj.name} bold onSave={onUpdate ? (v) => {
-                  upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, name: v } : p) });
-                } : undefined} />
-                <ProjectUrlEditor
-                  url={proj.url}
-                  onSave={onUpdate ? (url) => {
-                    upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, url } : p) });
+        {/* Skills */}
+        <Section title="Technical Skills">
+          <div className="grid grid-cols-1 gap-1">
+            {Object.entries(resume.skills).map(([label, items]) =>
+              items?.length > 0 ? (
+                <EditableSkillRow
+                  key={label}
+                  label={label}
+                  items={items}
+                  onSave={onUpdate ? (newLabel, newItems) => {
+                    const newSkills: Record<string, string[]> = {};
+                    for (const [k, v] of Object.entries(resume.skills)) {
+                      newSkills[k === label ? newLabel : k] = v;
+                    }
+                    newSkills[newLabel] = newItems;
+                    upd({ skills: newSkills });
                   } : undefined}
                 />
-              </div>
-              <EBlock value={proj.description} onSave={onUpdate ? (v) => {
-                upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, description: v } : p) });
-              } : undefined} />
-              <E value={proj.technologies.join(", ")} small muted onSave={onUpdate ? (v) => {
-                upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, technologies: v.split(",").map((t) => t.trim()).filter(Boolean) } : p) });
-              } : undefined} />
-            </div>
-          ))}
+              ) : null
+            )}
+          </div>
         </Section>
-      )}
 
-      {/* Education */}
-      {resume.education?.length > 0 && (
-        <Section title="Education">
-          {resume.education.map((ed, i) => (
-            <div key={i} className="flex flex-wrap justify-between items-baseline mb-1 gap-x-1">
-              <div className="flex flex-wrap items-baseline gap-x-1">
-                <E value={ed.school} bold onSave={onUpdate ? (v) => {
-                  upd({ education: resume.education.map((e, j) => j === i ? { ...e, school: v } : e) });
+        {/* Experience */}
+        {resume.experience?.length > 0 && (
+          <Section title="Professional Experience">
+            {resume.experience.map((exp, i) => (
+              <div key={i} className="mb-4">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex flex-wrap items-baseline gap-x-1">
+                    <E value={exp.title} bold onSave={onUpdate ? (v) => {
+                      upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, title: v } : e) });
+                    } : undefined} />
+                    <span className="text-gray-500"> — </span>
+                    <E value={exp.company} onSave={onUpdate ? (v) => {
+                      upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, company: v } : e) });
+                    } : undefined} />
+                  </div>
+                  <div className="text-xs text-gray-500 whitespace-nowrap flex items-center gap-1 flex-shrink-0">
+                    <E value={exp.startDate} small onSave={onUpdate ? (v) => {
+                      upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, startDate: v } : e) });
+                    } : undefined} />
+                    <span>–</span>
+                    <E value={exp.endDate} small onSave={onUpdate ? (v) => {
+                      upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, endDate: v } : e) });
+                    } : undefined} />
+                  </div>
+                </div>
+                {exp.location && (
+                  <div className="mt-0.5">
+                    <E value={exp.location} small muted onSave={onUpdate ? (v) => {
+                      upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, location: v } : e) });
+                    } : undefined} />
+                  </div>
+                )}
+                <ul className="list-disc list-outside ml-4 space-y-0.5 mt-1">
+                  {exp.bullets.map((b, j) => (
+                    <li key={j} className="text-gray-700">
+                      <E value={b} wide onSave={onUpdate ? (v) => {
+                        const bullets = exp.bullets.map((x, k) => k === j ? v : x);
+                        upd({ experience: resume.experience.map((e, k) => k === i ? { ...e, bullets } : e) });
+                      } : undefined} onDelete={onUpdate ? () => {
+                        const bullets = exp.bullets.filter((_, k) => k !== j);
+                        upd({ experience: resume.experience.map((e, k) => k === i ? { ...e, bullets } : e) });
+                      } : undefined} />
+                    </li>
+                  ))}
+                  {onUpdate && (
+                    <li className="list-none ml-[-1rem]">
+                      <button
+                        onClick={() => {
+                          const bullets = [...exp.bullets, "New bullet point"];
+                          upd({ experience: resume.experience.map((e, k) => k === i ? { ...e, bullets } : e) });
+                        }}
+                        className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-0.5"
+                      >
+                        <Plus size={11} /> Add bullet
+                      </button>
+                    </li>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {/* Projects */}
+        {resume.projects?.length > 0 && (
+          <Section title="Projects">
+            {resume.projects.map((proj, i) => (
+              <div key={i} className="mb-3">
+                <div className="flex justify-between items-start gap-2">
+                  <E value={proj.name} bold onSave={onUpdate ? (v) => {
+                    upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, name: v } : p) });
+                  } : undefined} />
+                  <ProjectUrlEditor
+                    url={proj.url}
+                    onSave={onUpdate ? (url) => {
+                      upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, url } : p) });
+                    } : undefined}
+                  />
+                </div>
+                <EBlock value={proj.description} onSave={onUpdate ? (v) => {
+                  upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, description: v } : p) });
                 } : undefined} />
-                <span className="text-gray-500"> — </span>
-                <E value={ed.degree} onSave={onUpdate ? (v) => {
-                  upd({ education: resume.education.map((e, j) => j === i ? { ...e, degree: v } : e) });
-                } : undefined} />
-                <span className="text-gray-500"> in </span>
-                <E value={ed.field} onSave={onUpdate ? (v) => {
-                  upd({ education: resume.education.map((e, j) => j === i ? { ...e, field: v } : e) });
+                <E value={proj.technologies.join(", ")} small muted onSave={onUpdate ? (v) => {
+                  upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, technologies: v.split(",").map((t) => t.trim()).filter(Boolean) } : p) });
                 } : undefined} />
               </div>
-              <E value={ed.graduationDate} small muted onSave={onUpdate ? (v) => {
-                upd({ education: resume.education.map((e, j) => j === i ? { ...e, graduationDate: v } : e) });
-              } : undefined} />
-            </div>
-          ))}
-        </Section>
-      )}
+            ))}
+          </Section>
+        )}
+
+        {/* Education */}
+        {resume.education?.length > 0 && (
+          <Section title="Education">
+            {resume.education.map((ed, i) => (
+              <div key={i} className="flex flex-wrap justify-between items-baseline mb-1 gap-x-1">
+                <div className="flex flex-wrap items-baseline gap-x-1">
+                  <E value={ed.school} bold onSave={onUpdate ? (v) => {
+                    upd({ education: resume.education.map((e, j) => j === i ? { ...e, school: v } : e) });
+                  } : undefined} />
+                  <span className="text-gray-500"> — </span>
+                  <E value={ed.degree} onSave={onUpdate ? (v) => {
+                    upd({ education: resume.education.map((e, j) => j === i ? { ...e, degree: v } : e) });
+                  } : undefined} />
+                  <span className="text-gray-500"> in </span>
+                  <E value={ed.field} onSave={onUpdate ? (v) => {
+                    upd({ education: resume.education.map((e, j) => j === i ? { ...e, field: v } : e) });
+                  } : undefined} />
+                </div>
+                <E value={ed.graduationDate} small muted onSave={onUpdate ? (v) => {
+                  upd({ education: resume.education.map((e, j) => j === i ? { ...e, graduationDate: v } : e) });
+                } : undefined} />
+              </div>
+            ))}
+          </Section>
+        )}
+      </div>
+    </AccentCtx.Provider>
+  );
+}
+
+/* ── Section with accent colors from context ── */
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  const c = useContext(AccentCtx);
+  return (
+    <div className="mb-4">
+      <h2
+        className="text-xs font-bold uppercase tracking-widest border-b pb-0.5 mb-2"
+        style={{ color: c.sectionText, borderColor: c.sectionBorder }}
+      >
+        {title}
+      </h2>
+      {children}
     </div>
   );
 }
@@ -206,7 +235,7 @@ function E({
   const [draft, setDraft] = useState(value);
 
   const cls = [
-    bold ? "font-bold text-gray-900" : "",
+    bold  ? "font-bold text-gray-900" : "",
     small ? "text-xs" : "",
     muted ? "text-gray-500" : (!bold ? "text-gray-700" : ""),
   ].filter(Boolean).join(" ");
@@ -245,7 +274,7 @@ function E({
   );
 }
 
-/* ── Multiline editable block (textarea) ── */
+/* ── Multiline editable block ── */
 function EBlock({ value, onSave }: { value: string; onSave?: (v: string) => void }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
@@ -256,8 +285,7 @@ function EBlock({ value, onSave }: { value: string; onSave?: (v: string) => void
     return (
       <div className="flex flex-col gap-1">
         <textarea
-          autoFocus
-          value={draft}
+          autoFocus value={draft}
           onChange={(e) => setDraft(e.target.value)}
           rows={4}
           className="w-full border border-blue-400 rounded px-2 py-1 text-sm outline-none text-gray-800 resize-y"
@@ -271,11 +299,8 @@ function EBlock({ value, onSave }: { value: string; onSave?: (v: string) => void
   }
 
   return (
-    <p
-      className="text-gray-700 cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors"
-      title="Click to edit"
-      onClick={() => { setDraft(value); setEditing(true); }}
-    >
+    <p className="text-gray-700 cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors" title="Click to edit"
+      onClick={() => { setDraft(value); setEditing(true); }}>
       {value}
     </p>
   );
@@ -332,7 +357,6 @@ function ProjectUrlEditor({ url, onSave }: { url?: string; onSave?: (url: string
   if (!onSave) {
     return url ? <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">{url}</a> : null;
   }
-
   if (editing) {
     return (
       <span className="inline-flex items-center gap-1">
@@ -347,7 +371,6 @@ function ProjectUrlEditor({ url, onSave }: { url?: string; onSave?: (url: string
       </span>
     );
   }
-
   return (
     <span className="flex items-center gap-1 flex-shrink-0">
       {url && <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">{url}</a>}
@@ -355,14 +378,5 @@ function ProjectUrlEditor({ url, onSave }: { url?: string; onSave?: (url: string
         {url ? <Pencil size={11} /> : <Link2 size={13} />}
       </button>
     </span>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="mb-4">
-      <h2 className="text-xs font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-0.5 mb-2">{title}</h2>
-      {children}
-    </div>
   );
 }
