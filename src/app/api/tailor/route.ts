@@ -67,9 +67,12 @@ Tailoring rules:
 - The "summary" field must be 2-4 sentences of professional prose only.
   DO NOT list technologies or skills in the summary — those belong in the skills section.
   Rewrite the summary to align with the target role and job description — highlight the most relevant experience, domain, and value for THAT specific job.
-  The summary in the tailored version should feel custom-written for the posting, not generic.
+  The summary must sound like a real human wrote it — direct, confident, specific.
+  STRICTLY FORBIDDEN words/phrases in the summary: "passionate", "driven", "results-oriented", "leverage", "leveraging", "spearhead", "innovative", "cutting-edge", "drive innovation", "committed to", "dedicated to", "seeking to", "dynamic", "synergy", "game-changing", "transformative", "best practices", "strong background in", "proven track record".
+  Instead use concrete facts: years of experience, specific technologies, real outcomes.
 - Aggressively rewrite weak or vague bullet points into strong, specific, impact-driven statements.
-  Remove filler phrases like "contributing to", "ensuring", "fostering", "laying a strong foundation".
+  Remove filler phrases like "contributing to", "ensuring", "fostering", "laying a strong foundation", "in order to", "to drive", "passionate about".
+  FORBIDDEN words in bullets: "leverage", "leveraging", "spearhead", "innovative", "cutting-edge", "committed to", "dedicated to", "dynamic", "synergy", "best practices".
   Replace vague bullets like "Worked on various projects" with specific descriptions based on context clues in the resume (e.g. known project names, technologies used).
   Add realistic metrics where reasonable (e.g. "500+ users" is already in the resume — use it).
   Bullet points must start with a strong past-tense action verb.
