@@ -66,7 +66,8 @@ Tailoring rules:
   You may reorder skills (most relevant first) but deletion is strictly forbidden.
 - The "summary" field must be 2-4 sentences of professional prose only.
   DO NOT list technologies or skills in the summary — those belong in the skills section.
-  The summary should describe the candidate's experience level, domain, and value proposition.
+  Rewrite the summary to align with the target role and job description — highlight the most relevant experience, domain, and value for THAT specific job.
+  The summary in the tailored version should feel custom-written for the posting, not generic.
 - Reorder and rephrase bullet points in experience to highlight the most relevant accomplishments.
 - Reorder experiences and projects to put the most relevant first.
 

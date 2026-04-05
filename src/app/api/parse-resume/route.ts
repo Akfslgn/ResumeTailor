@@ -42,7 +42,9 @@ export async function POST(req: NextRequest) {
 
     if (file.type === "application/pdf") {
       const { extractText } = await import("unpdf");
-      const { text: pages } = await extractText(new Uint8Array(buffer), { mergePages: true });
+      const { text: pages } = await extractText(new Uint8Array(buffer), {
+        mergePages: true,
+      });
       text = Array.isArray(pages) ? pages.join("\n") : (pages as string);
     } else if (
       file.type ===
