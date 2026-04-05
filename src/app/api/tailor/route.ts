@@ -74,7 +74,8 @@ Tailoring rules:
   DO NOT list technologies or skills in the summary — those belong in the skills section.
   Rewrite the summary to align with the target role and job description — highlight the most relevant experience, domain, and value for THAT specific job.
   The summary must sound like a real human wrote it — direct, confident, specific.
-  STRICTLY FORBIDDEN words/phrases in the summary: "passionate", "driven", "results-oriented", "leverage", "leveraging", "spearhead", "innovative", "cutting-edge", "drive innovation", "committed to", "dedicated to", "seeking to", "dynamic", "synergy", "game-changing", "transformative", "best practices", "strong background in", "proven track record".
+  STRICTLY FORBIDDEN words/phrases in the summary: "passionate", "driven", "results-oriented", "leverage", "leveraging", "spearhead", "innovative", "cutting-edge", "drive innovation", "committed to", "dedicated to", "seeking to", "dynamic", "synergy", "game-changing", "transformative", "best practices", "strong background in", "proven track record", "aligning well", "align with", "aligns with".
+  NEVER mention the company name or job title from the job description inside the summary.
   Instead use concrete facts: years of experience, specific technologies, real outcomes.
   When stating years of experience, SUM ALL positions in the resume (including freelance / teaching / all roles). Do NOT count only the most recent job.
 - Aggressively rewrite weak or vague bullet points into strong, specific, impact-driven statements.
