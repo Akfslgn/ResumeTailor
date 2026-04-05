@@ -126,12 +126,13 @@ Return JSON with "original" and "tailored" keys.`;
             if (!s) return null;
             const lower = s.toLowerCase().trim();
             if (lower === "present" || lower === "current") return new Date();
-            const d = new Date(s);
-            if (!isNaN(d.getTime())) return d;
             const match = s.match(/(\w+)\s+(\d{4})/);
-            if (match) return new Date(`${match[1]} 1, ${match[2]}`);
-            const yearMatch = s.match(/^(\d{4})$/);
-            if (yearMatch) return new Date(`Jan 1, ${yearMatch[1]}`);
+            if (match) {
+              const d = new Date(`${match[1]} 1, ${match[2]}`);
+              if (!isNaN(d.getTime())) return d;
+            }
+            const yearMatch = s.match(/(\d{4})/);
+            if (yearMatch) return new Date(parseInt(yearMatch[1]), 0, 1);
             return null;
           };
           const start = parseDate(job.startDate);

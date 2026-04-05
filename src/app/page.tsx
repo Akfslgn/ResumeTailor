@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Toaster, toast } from "react-hot-toast";
 import {
@@ -29,16 +29,42 @@ const PDFExport = dynamic(() => import("@/components/PDFExport"), {
 type Tab = "original" | "tailored";
 
 export default function Home() {
-  const [resumeText, setResumeText] = useState("");
-  const [jobDescription, setJobDescription] = useState("");
-  const [originalResume, setOriginalResume] = useState<Resume | null>(null);
-  const [tailoredResume, setTailoredResume] = useState<Resume | null>(null);
+  const [resumeText, setResumeText] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("rt_resumeText") ?? "";
+  });
+  const [jobDescription, setJobDescription] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("rt_jobDescription") ?? "";
+  });
+  const [originalResume, setOriginalResume] = useState<Resume | null>(() => {
+    if (typeof window === "undefined") return null;
+    try { return JSON.parse(localStorage.getItem("rt_original") ?? "null"); } catch { return null; }
+  });
+  const [tailoredResume, setTailoredResume] = useState<Resume | null>(() => {
+    if (typeof window === "undefined") return null;
+    try { return JSON.parse(localStorage.getItem("rt_tailored") ?? "null"); } catch { return null; }
+  });
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>("original");
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    if (typeof window === "undefined") return "original";
+    return (localStorage.getItem("rt_activeTab") as Tab) ?? "original";
+  });
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("rt_fileName") ?? null;
+  });
   const [parsing, setParsing] = useState(false);
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Persist to localStorage on change
+  useEffect(() => { localStorage.setItem("rt_resumeText", resumeText); }, [resumeText]);
+  useEffect(() => { localStorage.setItem("rt_jobDescription", jobDescription); }, [jobDescription]);
+  useEffect(() => { localStorage.setItem("rt_original", JSON.stringify(originalResume)); }, [originalResume]);
+  useEffect(() => { localStorage.setItem("rt_tailored", JSON.stringify(tailoredResume)); }, [tailoredResume]);
+  useEffect(() => { localStorage.setItem("rt_activeTab", activeTab); }, [activeTab]);
+  useEffect(() => { localStorage.setItem("rt_fileName", uploadedFileName ?? ""); }, [uploadedFileName]);
 
   const displayedResume =
     activeTab === "tailored" && tailoredResume
@@ -84,6 +110,12 @@ export default function Home() {
     setTailoredResume(null);
     setActiveTab("original");
     setUploadedFileName(null);
+    localStorage.removeItem("rt_resumeText");
+    localStorage.removeItem("rt_jobDescription");
+    localStorage.removeItem("rt_original");
+    localStorage.removeItem("rt_tailored");
+    localStorage.removeItem("rt_activeTab");
+    localStorage.removeItem("rt_fileName");
   }
 
   const handleFile = useCallback(async (file: File) => {
