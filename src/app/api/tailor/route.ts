@@ -74,10 +74,15 @@ Tailoring rules:
   DO NOT list technologies or skills in the summary — those belong in the skills section.
   Rewrite the summary to align with the target role and job description — highlight the most relevant experience, domain, and value for THAT specific job.
   The summary must sound like a real human wrote it — direct, confident, specific.
-  STRICTLY FORBIDDEN words/phrases in the summary: "passionate", "driven", "results-oriented", "leverage", "leveraging", "spearhead", "innovative", "cutting-edge", "drive innovation", "committed to", "dedicated to", "seeking to", "dynamic", "synergy", "game-changing", "transformative", "best practices", "strong background in", "proven track record", "aligning well", "align with", "aligns with".
+  STRICTLY FORBIDDEN words/phrases in the summary: "passionate", "driven", "results-oriented", "leverage", "leveraging", "spearhead", "innovative", "cutting-edge", "drive innovation", "committed to", "dedicated to", "seeking to", "dynamic", "synergy", "game-changing", "transformative", "best practices", "strong background in", "solid foundation in", "proven track record", "aligning well", "align with", "aligns with", "I thrive", "specialize in crafting", "emphasizes", "collaborative environments".
   NEVER mention the company name or job title from the job description inside the summary.
-  Instead use concrete facts: years of experience, specific technologies, real outcomes.
   When stating years of experience, SUM ALL positions in the resume (including freelance / teaching / all roles). Do NOT count only the most recent job.
+
+  BAD summary (do NOT write like this):
+  "With over 5 years of experience, I specialize in crafting responsive UIs using React. My work emphasizes performance and code quality. I thrive in collaborative environments, contributing effectively to Agile teams."
+
+  GOOD summary (write like this):
+  "Full Stack Developer with 8+ years of experience building production web apps across the full stack — React on the front, Node.js and Flask on the back, PostgreSQL underneath. Shipped systems handling 500+ concurrent users, cut API response times by 30%, and delivered role-based auth for real clients. Most comfortable when moving fast between backend logic and frontend polish."
 - Aggressively rewrite weak or vague bullet points into strong, specific, impact-driven statements.
   Remove filler phrases like "contributing to", "ensuring", "fostering", "laying a strong foundation", "in order to", "to drive", "passionate about".
   FORBIDDEN words in bullets: "leverage", "leveraging", "spearhead", "innovative", "cutting-edge", "committed to", "dedicated to", "dynamic", "synergy", "best practices".
