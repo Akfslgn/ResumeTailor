@@ -63,8 +63,22 @@ export default function ResumePreview({ resume, onUpdate }: Props) {
             <div key={i} className="mb-4">
               <div className="flex justify-between items-baseline">
                 <div>
-                  <span className="font-bold text-gray-900">{exp.title}</span>
-                  <span className="text-gray-600"> — {exp.company}</span>
+                  <EditableText
+                    value={exp.title}
+                    bold
+                    onSave={onUpdate ? (val) => {
+                      const updated = { ...resume, experience: resume.experience.map((e, j) => j === i ? { ...e, title: val } : e) };
+                      onUpdate(updated);
+                    } : undefined}
+                  />
+                  <span className="text-gray-600"> — </span>
+                  <EditableText
+                    value={exp.company}
+                    onSave={onUpdate ? (val) => {
+                      const updated = { ...resume, experience: resume.experience.map((e, j) => j === i ? { ...e, company: val } : e) };
+                      onUpdate(updated);
+                    } : undefined}
+                  />
                 </div>
                 <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
                   {exp.startDate} – {exp.endDate}
@@ -153,6 +167,53 @@ function SkillRow({ label, items }: { label: string; items: string[] }) {
       <span className="font-semibold">{label}: </span>
       {items.join(", ")}
     </p>
+  );
+}
+
+function EditableText({
+  value,
+  bold,
+  onSave,
+}: {
+  value: string;
+  bold?: boolean;
+  onSave?: (val: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+
+  if (!onSave) {
+    return <span className={bold ? "font-bold text-gray-900" : "text-gray-600"}>{value}</span>;
+  }
+
+  if (editing) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <input
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") { onSave(draft.trim()); setEditing(false); }
+            if (e.key === "Escape") setEditing(false);
+          }}
+          className={`border border-blue-400 rounded px-1 py-0 text-sm outline-none text-gray-800 ${bold ? "font-bold" : ""}`}
+          style={{ width: `${Math.max(draft.length, 10)}ch` }}
+        />
+        <button onClick={() => { onSave(draft.trim()); setEditing(false); }} className="text-green-600 hover:text-green-700"><Check size={12} /></button>
+        <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600"><X size={12} /></button>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors ${bold ? "font-bold text-gray-900" : "text-gray-600"}`}
+      title="Click to edit"
+      onClick={() => { setDraft(value); setEditing(true); }}
+    >
+      {value}
+    </span>
   );
 }
 
