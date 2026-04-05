@@ -115,6 +115,62 @@ Return JSON with "original" and "tailored" keys.`;
     }
 
     const parsed = JSON.parse(raw) as { original: Resume; tailored: Resume };
+
+    // Second pass: rewrite summary separately with focused prompt
+    const totalYears = (() => {
+      const jobs = parsed.original.experience ?? [];
+      let months = 0;
+      for (const job of jobs) {
+        try {
+          const start = new Date(job.startDate);
+          const end = job.endDate?.toLowerCase().includes("present")
+            ? new Date()
+            : new Date(job.endDate);
+          if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+            months += (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+          }
+        } catch { /* skip */ }
+      }
+      return Math.max(1, Math.round(months / 12));
+    })();
+
+    const summaryCompletion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `Write a resume professional summary. 2-3 sentences. No fluff.
+
+Rules:
+- Start with role + years of experience (use exactly ${totalYears}+ years)
+- Include 1-2 specific achievements with numbers from the resume
+- End with what the person does best in plain words
+- NEVER start with: "I specialize", "With over", "I am a", "As a"
+- NEVER use: passionate, leverage, innovative, cutting-edge, dynamic, synergy, committed to, dedicated to, collaborative environments, I thrive, strong background, proven track record, solid foundation, specialize in
+
+Return JSON: { "summary": "..." }`,
+        },
+        {
+          role: "user",
+          content: `Resume data: ${JSON.stringify({ experience: parsed.original.experience, skills: parsed.original.skills, projects: parsed.original.projects })}
+
+Job description: ${jobDescription.slice(0, 1500)}
+
+Write the summary now.`,
+        },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.8,
+    });
+
+    const summaryRaw = summaryCompletion.choices[0].message.content;
+    if (summaryRaw) {
+      try {
+        const { summary } = JSON.parse(summaryRaw) as { summary: string };
+        if (summary) parsed.tailored.summary = summary;
+      } catch { /* keep original summary if parse fails */ }
+    }
+
     return NextResponse.json({
       original: parsed.original,
       tailored: parsed.tailored,
