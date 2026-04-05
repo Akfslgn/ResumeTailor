@@ -117,16 +117,30 @@ Return JSON with "original" and "tailored" keys.`;
     const parsed = JSON.parse(raw) as { original: Resume; tailored: Resume };
 
     // Second pass: rewrite summary separately with focused prompt
+    // Calculate total years robustly
     const totalYears = (() => {
       const jobs = parsed.original.experience ?? [];
       let months = 0;
       for (const job of jobs) {
         try {
-          const start = new Date(job.startDate);
-          const end = job.endDate?.toLowerCase().includes("present")
-            ? new Date()
-            : new Date(job.endDate);
-          if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+          const parseDate = (s: string) => {
+            if (!s) return null;
+            const lower = s.toLowerCase().trim();
+            if (lower === "present" || lower === "current") return new Date();
+            // Try direct parse first
+            const d = new Date(s);
+            if (!isNaN(d.getTime())) return d;
+            // Try "Month YYYY" format
+            const match = s.match(/(\w+)\s+(\d{4})/);
+            if (match) return new Date(`${match[1]} 1, ${match[2]}`);
+            // Try bare year "2022"
+            const yearMatch = s.match(/^(\d{4})$/);
+            if (yearMatch) return new Date(`Jan 1, ${yearMatch[1]}`);
+            return null;
+          };
+          const start = parseDate(job.startDate);
+          const end = parseDate(job.endDate);
+          if (start && end) {
             months += (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
           }
         } catch { /* skip */ }
@@ -139,28 +153,40 @@ Return JSON with "original" and "tailored" keys.`;
       messages: [
         {
           role: "system",
-          content: `Write a resume professional summary. 2-3 sentences. No fluff.
+          content: `You write resume summaries. 2-3 sentences. Brutally direct.
 
-Rules:
-- Start with role + years of experience (use exactly ${totalYears}+ years)
-- Include 1-2 specific achievements with numbers from the resume
-- End with what the person does best in plain words
-- NEVER start with: "I specialize", "With over", "I am a", "As a"
-- NEVER use: passionate, leverage, innovative, cutting-edge, dynamic, synergy, committed to, dedicated to, collaborative environments, I thrive, strong background, proven track record, solid foundation, specialize in
+FORBIDDEN opening phrases — if you start with any of these you have failed:
+❌ "As a Full Stack Developer"
+❌ "As a [anything]"  
+❌ "With over"
+❌ "With [number] years"
+❌ "I specialize in"
+❌ "I am a"
+❌ "[Role] with over"
+
+FORBIDDEN words anywhere: crafting, passionate, leverage, innovative, dynamic, synergy, committed to, dedicated to, I thrive, specialize in, strong background, proven track record, solid foundation, emphasizes, collaborative environments, successfully
+
+REQUIRED structure:
+Sentence 1: "[Role] — [${totalYears}]+ years [brief what you build, 1 stack mention max]."
+Sentence 2: "[Specific achievement from resume with a number]. [Another achievement with a number if available]."  
+Sentence 3: "[What you do best technically in plain words — no soft skills, no team collaboration fluff]."
+
+Example output (this is the style, not the content to copy):
+"Full Stack Developer — 8+ years building production apps on React, Flask, and PostgreSQL. Shipped a library platform for 500+ users with role-based JWT auth; cut DB query times by 30% through index tuning. Strongest end-to-end: takes a feature from API design to deployed UI without hand-holding."
 
 Return JSON: { "summary": "..." }`,
         },
         {
           role: "user",
-          content: `Resume data: ${JSON.stringify({ experience: parsed.original.experience, skills: parsed.original.skills, projects: parsed.original.projects })}
+          content: `Experience: ${JSON.stringify(parsed.original.experience)}
+Projects: ${JSON.stringify(parsed.original.projects)}
+Job target: ${jobDescription.slice(0, 800)}
 
-Job description: ${jobDescription.slice(0, 1500)}
-
-Write the summary now.`,
+Write the summary now. Do NOT start with "As a" or "With over" or "I specialize".`,
         },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.8,
+      temperature: 0.9,
     });
 
     const summaryRaw = summaryCompletion.choices[0].message.content;
