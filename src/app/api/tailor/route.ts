@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { Resume } from "@/types/resume";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 const RESUME_SCHEMA = `{
   name, email, phone, location, linkedin?, github?, website?,
   summary,
@@ -46,6 +42,7 @@ export async function POST(req: NextRequest) {
         { status: 500 },
       );
     }
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const systemPrompt = `You are an expert resume writer and career coach.
 
