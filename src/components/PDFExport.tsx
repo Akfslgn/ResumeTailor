@@ -22,7 +22,9 @@ function makeStyles(s: ResumeSettings) {
   const fs = fontSizePt(s.fontSize);
   const lh = lineHeightPDF(s.lineHeight);
   const ac = ACCENT[s.accentColor];
-  return StyleSheet.create({
+  return {
+    boldFont: bold,
+    styles: StyleSheet.create({
     page: { padding: 40, fontSize: fs, fontFamily: base, color: "#111111", lineHeight: lh },
     header: { textAlign: "center", marginBottom: 10, borderBottomWidth: 1.5, borderBottomColor: ac.pdfBorder, paddingBottom: 8 },
     name: { fontSize: fs * 2, fontFamily: bold, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 },
@@ -47,11 +49,28 @@ function makeStyles(s: ResumeSettings) {
     eduRow: { flexDirection: "row", justifyContent: "space-between" },
     eduBold: { fontFamily: bold },
     mb3: { marginBottom: 4 },
-  });
+  }),
+  };
+}
+
+// Renders text with **bold** markers as bold inline segments
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function RichText({ text, style, boldFont }: { text: string; style: any; boldFont: string }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  if (parts.length === 1) return <Text style={style}>{text}</Text>;
+  return (
+    <Text style={style}>
+      {parts.map((part, i) =>
+        part.startsWith("**") && part.endsWith("**")
+          ? <Text key={i} style={{ fontFamily: boldFont }}>{part.slice(2, -2)}</Text>
+          : <Text key={i}>{part}</Text>
+      )}
+    </Text>
+  );
 }
 
 function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume; settings?: ResumeSettings }) {
-  const styles = makeStyles(settings);
+  const { styles, boldFont } = makeStyles(settings);
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -90,7 +109,7 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
         {resume.summary && (
           <View>
             <Text style={styles.sectionTitle}>Professional Summary</Text>
-            <Text style={{ color: "#333333" }}>{resume.summary}</Text>
+            <RichText text={resume.summary} style={{ color: "#333333" }} boldFont={boldFont} />
           </View>
         )}
 
@@ -128,7 +147,7 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
                 {exp.bullets.map((b, j) => (
                   <View key={j} style={styles.bullet}>
                     <Text style={styles.bulletDot}>•</Text>
-                    <Text style={styles.bulletText}>{b}</Text>
+                    <RichText text={b} style={styles.bulletText} boldFont={boldFont} />
                   </View>
                 ))}
               </View>
@@ -150,7 +169,7 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
                     </Link>
                   )}
                 </View>
-                <Text style={styles.projectDesc}>{proj.description}</Text>
+                <RichText text={proj.description} style={styles.projectDesc} boldFont={boldFont} />
                 <Text style={styles.projectTech}>
                   {proj.technologies.join(" · ")}
                 </Text>

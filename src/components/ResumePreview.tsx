@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useRef } from "react";
 import { Link2, Pencil, Check, X, Plus, Trash2 } from "lucide-react";
 import { Resume } from "@/types/resume";
 import {
@@ -15,6 +15,29 @@ interface Props {
 
 type AccentColors = { headerBorder: string; sectionBorder: string; sectionText: string; pdfBorder: string; pdfTitle: string };
 const AccentCtx = createContext<AccentColors>(ACCENT.black);
+
+// Parse **bold** markers into React nodes
+function parseMarkup(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  if (parts.length === 1) return text;
+  return parts.map((part, i) =>
+    part.startsWith("**") && part.endsWith("**")
+      ? <strong key={i}>{part.slice(2, -2)}</strong>
+      : <span key={i}>{part}</span>
+  );
+}
+
+// Wrap/unwrap selection in **...**
+function applyFormat(el: HTMLInputElement | HTMLTextAreaElement, draft: string, setDraft: (v: string) => void) {
+  const start = el.selectionStart ?? 0;
+  const end = el.selectionEnd ?? 0;
+  if (start === end) return;
+  const sel = draft.slice(start, end);
+  const toggled = sel.startsWith("**") && sel.endsWith("**")
+    ? draft.slice(0, start) + sel.slice(2, -2) + draft.slice(end)
+    : draft.slice(0, start) + `**${sel}**` + draft.slice(end);
+  setDraft(toggled);
+}
 
 export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SETTINGS }: Props) {
   const accent = ACCENT[settings.accentColor];
@@ -233,6 +256,7 @@ function E({
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const cls = [
     bold  ? "font-bold text-gray-900" : "",
@@ -240,18 +264,26 @@ function E({
     muted ? "text-gray-500" : (!bold ? "text-gray-700" : ""),
   ].filter(Boolean).join(" ");
 
-  if (!onSave) return <span className={cls}>{value}</span>;
+  if (!onSave) return <span className={cls}>{parseMarkup(value)}</span>;
 
   if (editing) {
     return (
       <span className="inline-flex items-center gap-1">
+        <button
+          type="button"
+          onMouseDown={(e) => { e.preventDefault(); if (inputRef.current) applyFormat(inputRef.current, draft, setDraft); }}
+          title="Bold selected text (Ctrl+B)"
+          className="px-1.5 py-0 text-xs font-bold border border-gray-300 rounded hover:bg-gray-100 text-gray-700 flex-shrink-0 leading-4"
+        >B</button>
         <input
+          ref={inputRef}
           autoFocus
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") { onSave(draft.trim()); setEditing(false); }
             if (e.key === "Escape") setEditing(false);
+            if ((e.ctrlKey || e.metaKey) && e.key === "b") { e.preventDefault(); if (inputRef.current) applyFormat(inputRef.current, draft, setDraft); }
           }}
           className={`border border-blue-400 rounded px-1 py-0 outline-none text-gray-800 ${bold ? "font-bold" : ""} ${small ? "text-xs" : "text-sm"}`}
           style={{ width: wide ? "100%" : `${Math.max((draft.length || 8) + 2, 8)}ch`, minWidth: "6ch" }}
@@ -269,7 +301,7 @@ function E({
       title="Click to edit"
       onClick={() => { setDraft(value); setEditing(true); }}
     >
-      {value}
+      {parseMarkup(value)}
     </span>
   );
 }
@@ -278,15 +310,29 @@ function E({
 function EBlock({ value, onSave }: { value: string; onSave?: (v: string) => void }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
+  const taRef = useRef<HTMLTextAreaElement>(null);
 
-  if (!onSave) return <p className="text-gray-700">{value}</p>;
+  if (!onSave) return <p className="text-gray-700">{parseMarkup(value)}</p>;
 
   if (editing) {
     return (
       <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <button
+            type="button"
+            onMouseDown={(e) => { e.preventDefault(); if (taRef.current) applyFormat(taRef.current, draft, setDraft); }}
+            title="Bold selected text (Ctrl+B)"
+            className="px-2 py-0.5 text-xs font-bold border border-gray-300 rounded hover:bg-gray-100 text-gray-700"
+          >B</button>
+          <span className="text-xs text-gray-400">Metni seçip B'ye tıkla</span>
+        </div>
         <textarea
+          ref={taRef}
           autoFocus value={draft}
           onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === "b") { e.preventDefault(); if (taRef.current) applyFormat(taRef.current, draft, setDraft); }
+          }}
           rows={4}
           className="w-full border border-blue-400 rounded px-2 py-1 text-sm outline-none text-gray-800 resize-y"
         />
@@ -301,7 +347,7 @@ function EBlock({ value, onSave }: { value: string; onSave?: (v: string) => void
   return (
     <p className="text-gray-700 cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors" title="Click to edit"
       onClick={() => { setDraft(value); setEditing(true); }}>
-      {value}
+      {parseMarkup(value)}
     </p>
   );
 }
