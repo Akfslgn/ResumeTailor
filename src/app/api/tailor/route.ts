@@ -116,8 +116,7 @@ Return JSON with "original" and "tailored" keys.`;
 
     const parsed = JSON.parse(raw) as { original: Resume; tailored: Resume };
 
-    // Second pass: rewrite summary separately with focused prompt
-    // Calculate total years robustly
+    // Second pass: rewrite summary with hardcoded first sentence prefix
     const totalYears = (() => {
       const jobs = parsed.original.experience ?? [];
       let months = 0;
@@ -127,13 +126,10 @@ Return JSON with "original" and "tailored" keys.`;
             if (!s) return null;
             const lower = s.toLowerCase().trim();
             if (lower === "present" || lower === "current") return new Date();
-            // Try direct parse first
             const d = new Date(s);
             if (!isNaN(d.getTime())) return d;
-            // Try "Month YYYY" format
             const match = s.match(/(\w+)\s+(\d{4})/);
             if (match) return new Date(`${match[1]} 1, ${match[2]}`);
-            // Try bare year "2022"
             const yearMatch = s.match(/^(\d{4})$/);
             if (yearMatch) return new Date(`Jan 1, ${yearMatch[1]}`);
             return null;
@@ -148,52 +144,45 @@ Return JSON with "original" and "tailored" keys.`;
       return Math.max(1, Math.round(months / 12));
     })();
 
+    // Determine role from most recent job title
+    const latestTitle = parsed.original.experience?.[0]?.title ?? "Full Stack Developer";
+    const firstSentence = `${latestTitle} — ${totalYears}+ years building web applications.`;
+
     const summaryCompletion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: `You write resume summaries. 2-3 sentences. Brutally direct.
+          content: `Complete a resume professional summary. The first sentence is already written — you must NOT change it or restate it. Only add 1-2 more sentences after it.
 
-FORBIDDEN opening phrases — if you start with any of these you have failed:
-❌ "As a Full Stack Developer"
-❌ "As a [anything]"  
-❌ "With over"
-❌ "With [number] years"
-❌ "I specialize in"
-❌ "I am a"
-❌ "[Role] with over"
+Rules for the sentences you add:
+- Pick the 1-2 most impressive achievements from the resume that have real numbers (users, %, count)
+- Last sentence: what this person does best technically — no soft skills, no Agile, no "collaborative"
+- FORBIDDEN words: crafting, passionate, leverage, innovative, dynamic, synergy, committed to, dedicated to, I thrive, specialize in, strong background, proven track record, solid foundation, successfully, collaborative, Agile teams, effectively
 
-FORBIDDEN words anywhere: crafting, passionate, leverage, innovative, dynamic, synergy, committed to, dedicated to, I thrive, specialize in, strong background, proven track record, solid foundation, emphasizes, collaborative environments, successfully
-
-REQUIRED structure:
-Sentence 1: "[Role] — [${totalYears}]+ years [brief what you build, 1 stack mention max]."
-Sentence 2: "[Specific achievement from resume with a number]. [Another achievement with a number if available]."  
-Sentence 3: "[What you do best technically in plain words — no soft skills, no team collaboration fluff]."
-
-Example output (this is the style, not the content to copy):
-"Full Stack Developer — 8+ years building production apps on React, Flask, and PostgreSQL. Shipped a library platform for 500+ users with role-based JWT auth; cut DB query times by 30% through index tuning. Strongest end-to-end: takes a feature from API design to deployed UI without hand-holding."
-
-Return JSON: { "summary": "..." }`,
+Return JSON: { "rest": "sentences 2 and 3 only, NOT including the first sentence" }`,
         },
         {
           role: "user",
-          content: `Experience: ${JSON.stringify(parsed.original.experience)}
+          content: `First sentence (already written, do not repeat): "${firstSentence}"
+
+Experience: ${JSON.stringify(parsed.original.experience)}
 Projects: ${JSON.stringify(parsed.original.projects)}
 Job target: ${jobDescription.slice(0, 800)}
 
-Write the summary now. Do NOT start with "As a" or "With over" or "I specialize".`,
+Write only the remaining 1-2 sentences.`,
         },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.9,
+      temperature: 0.85,
     });
 
     const summaryRaw = summaryCompletion.choices[0].message.content;
     if (summaryRaw) {
       try {
-        const { summary } = JSON.parse(summaryRaw) as { summary: string };
-        if (summary) parsed.tailored.summary = summary;
+        const parsed2 = JSON.parse(summaryRaw) as { rest?: string; summary?: string };
+        const rest = parsed2.rest ?? parsed2.summary ?? "";
+        if (rest) parsed.tailored.summary = `${firstSentence} ${rest}`;
       } catch { /* keep original summary if parse fails */ }
     }
 
