@@ -66,9 +66,9 @@ export default function Home() {
   );
   const [parsing, setParsing] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [fontStyle, setFontStyle] = useState<"serif" | "sans">(() => {
+  const [fontStyle, setFontStyle] = useState<"serif" | "sans" | "mono">(() => {
     if (typeof window === "undefined") return "serif";
-    return (localStorage.getItem("rt_font") as "serif" | "sans") ?? "serif";
+    return (localStorage.getItem("rt_font") as "serif" | "sans" | "mono") ?? "serif";
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -447,6 +447,13 @@ export default function Home() {
                   style={{ fontFamily: "Arial, sans-serif" }}
                 >
                   Sans
+                </button>
+                <button
+                  onClick={() => setFontStyle("mono")}
+                  className={`px-2.5 py-1 text-xs rounded-md transition-colors ${fontStyle === "mono" ? "bg-white text-slate-800 shadow-sm font-medium" : "text-slate-500 hover:text-slate-700"}`}
+                  style={{ fontFamily: "'Courier New', monospace" }}
+                >
+                  Mono
                 </button>
               </div>
               {displayedResume && <PDFExport resume={displayedResume} fontStyle={fontStyle} />}

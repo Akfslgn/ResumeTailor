@@ -1,16 +1,24 @@
 "use client";
 import { useState } from "react";
-import { Link2, Pencil, Check, X } from "lucide-react";
+import { Link2, Pencil, Check, X, Plus, Trash2 } from "lucide-react";
 import { Resume } from "@/types/resume";
 
 interface Props {
   resume: Resume;
   onUpdate?: (updated: Resume) => void;
-  fontStyle?: "serif" | "sans";
+  fontStyle?: "serif" | "sans" | "mono";
 }
 
 export default function ResumePreview({ resume, onUpdate, fontStyle = "serif" }: Props) {
-  const fontFamily = fontStyle === "sans" ? "Arial, Helvetica, sans-serif" : "Georgia, serif";
+  const fontFamily =
+    fontStyle === "sans" ? "Arial, Helvetica, sans-serif"
+    : fontStyle === "mono" ? "'Courier New', Courier, monospace"
+    : "Georgia, serif";
+
+  function upd(partial: Partial<Resume>) {
+    onUpdate?.({ ...resume, ...partial });
+  }
+
   return (
     <div
       id="resume-preview"
@@ -20,30 +28,28 @@ export default function ResumePreview({ resume, onUpdate, fontStyle = "serif" }:
       {/* Header */}
       <div className="text-center border-b-2 border-gray-800 pb-4 mb-4">
         <h1 className="text-3xl font-bold tracking-wide uppercase text-gray-900">
-          {resume.name}
+          <E value={resume.name} bold onSave={onUpdate ? (v) => upd({ name: v }) : undefined} />
         </h1>
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4 text-xs text-gray-600">
-          {resume.email && <span>{resume.email}</span>}
-          {resume.phone && <span>{resume.phone}</span>}
-          {resume.location && <span>{resume.location}</span>}
+          <E value={resume.email} onSave={onUpdate ? (v) => upd({ email: v }) : undefined} />
+          <E value={resume.phone} onSave={onUpdate ? (v) => upd({ phone: v }) : undefined} />
+          <E value={resume.location} onSave={onUpdate ? (v) => upd({ location: v }) : undefined} />
           {resume.linkedin && (
-            <span>
-              linkedin.com/in/{resume.linkedin.replace(/.*\/in\//, "")}
-            </span>
+            <E value={resume.linkedin} onSave={onUpdate ? (v) => upd({ linkedin: v }) : undefined} />
           )}
           {resume.github && (
-            <span>
-              github.com/{resume.github.replace(/.*github\.com\//, "")}
-            </span>
+            <E value={resume.github} onSave={onUpdate ? (v) => upd({ github: v }) : undefined} />
           )}
-          {resume.website && <span>{resume.website}</span>}
+          {resume.website && (
+            <E value={resume.website} onSave={onUpdate ? (v) => upd({ website: v }) : undefined} />
+          )}
         </div>
       </div>
 
       {/* Summary */}
       {resume.summary && (
         <Section title="Professional Summary">
-          <p className="text-gray-700">{resume.summary}</p>
+          <EBlock value={resume.summary} onSave={onUpdate ? (v) => upd({ summary: v }) : undefined} />
         </Section>
       )}
 
@@ -52,7 +58,19 @@ export default function ResumePreview({ resume, onUpdate, fontStyle = "serif" }:
         <div className="grid grid-cols-1 gap-1">
           {Object.entries(resume.skills).map(([label, items]) =>
             items?.length > 0 ? (
-              <SkillRow key={label} label={label} items={items} />
+              <EditableSkillRow
+                key={label}
+                label={label}
+                items={items}
+                onSave={onUpdate ? (newLabel, newItems) => {
+                  const newSkills: Record<string, string[]> = {};
+                  for (const [k, v] of Object.entries(resume.skills)) {
+                    newSkills[k === label ? newLabel : k] = v;
+                  }
+                  newSkills[newLabel] = newItems;
+                  upd({ skills: newSkills });
+                } : undefined}
+              />
             ) : null
           )}
         </div>
@@ -63,38 +81,58 @@ export default function ResumePreview({ resume, onUpdate, fontStyle = "serif" }:
         <Section title="Professional Experience">
           {resume.experience.map((exp, i) => (
             <div key={i} className="mb-4">
-              <div className="flex justify-between items-baseline">
-                <div>
-                  <EditableText
-                    value={exp.title}
-                    bold
-                    onSave={onUpdate ? (val) => {
-                      const updated = { ...resume, experience: resume.experience.map((e, j) => j === i ? { ...e, title: val } : e) };
-                      onUpdate(updated);
-                    } : undefined}
-                  />
-                  <span className="text-gray-600"> — </span>
-                  <EditableText
-                    value={exp.company}
-                    onSave={onUpdate ? (val) => {
-                      const updated = { ...resume, experience: resume.experience.map((e, j) => j === i ? { ...e, company: val } : e) };
-                      onUpdate(updated);
-                    } : undefined}
-                  />
+              <div className="flex justify-between items-start gap-2">
+                <div className="flex flex-wrap items-baseline gap-x-1">
+                  <E value={exp.title} bold onSave={onUpdate ? (v) => {
+                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, title: v } : e) });
+                  } : undefined} />
+                  <span className="text-gray-500"> — </span>
+                  <E value={exp.company} onSave={onUpdate ? (v) => {
+                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, company: v } : e) });
+                  } : undefined} />
                 </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                  {exp.startDate} – {exp.endDate}
-                </span>
+                <div className="text-xs text-gray-500 whitespace-nowrap flex items-center gap-1 flex-shrink-0">
+                  <E value={exp.startDate} small onSave={onUpdate ? (v) => {
+                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, startDate: v } : e) });
+                  } : undefined} />
+                  <span>–</span>
+                  <E value={exp.endDate} small onSave={onUpdate ? (v) => {
+                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, endDate: v } : e) });
+                  } : undefined} />
+                </div>
               </div>
               {exp.location && (
-                <p className="text-xs text-gray-500 mb-1">{exp.location}</p>
+                <div className="mt-0.5">
+                  <E value={exp.location} small muted onSave={onUpdate ? (v) => {
+                    upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, location: v } : e) });
+                  } : undefined} />
+                </div>
               )}
-              <ul className="list-disc list-outside ml-4 space-y-0.5">
+              <ul className="list-disc list-outside ml-4 space-y-0.5 mt-1">
                 {exp.bullets.map((b, j) => (
                   <li key={j} className="text-gray-700">
-                    {b}
+                    <E value={b} wide onSave={onUpdate ? (v) => {
+                      const bullets = exp.bullets.map((x, k) => k === j ? v : x);
+                      upd({ experience: resume.experience.map((e, k) => k === i ? { ...e, bullets } : e) });
+                    } : undefined} onDelete={onUpdate ? () => {
+                      const bullets = exp.bullets.filter((_, k) => k !== j);
+                      upd({ experience: resume.experience.map((e, k) => k === i ? { ...e, bullets } : e) });
+                    } : undefined} />
                   </li>
                 ))}
+                {onUpdate && (
+                  <li className="list-none ml-[-1rem]">
+                    <button
+                      onClick={() => {
+                        const bullets = [...exp.bullets, "New bullet point"];
+                        upd({ experience: resume.experience.map((e, k) => k === i ? { ...e, bullets } : e) });
+                      }}
+                      className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-0.5"
+                    >
+                      <Plus size={11} /> Add bullet
+                    </button>
+                  </li>
+                )}
               </ul>
             </div>
           ))}
@@ -105,19 +143,25 @@ export default function ResumePreview({ resume, onUpdate, fontStyle = "serif" }:
       {resume.projects?.length > 0 && (
         <Section title="Projects">
           {resume.projects.map((proj, i) => (
-            <ProjectCard
-              key={i}
-              proj={proj}
-              onUrlChange={onUpdate ? (url) => {
-                const updated = {
-                  ...resume,
-                  projects: resume.projects.map((p, j) =>
-                    j === i ? { ...p, url } : p
-                  ),
-                };
-                onUpdate(updated);
-              } : undefined}
-            />
+            <div key={i} className="mb-3">
+              <div className="flex justify-between items-start gap-2">
+                <E value={proj.name} bold onSave={onUpdate ? (v) => {
+                  upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, name: v } : p) });
+                } : undefined} />
+                <ProjectUrlEditor
+                  url={proj.url}
+                  onSave={onUpdate ? (url) => {
+                    upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, url } : p) });
+                  } : undefined}
+                />
+              </div>
+              <EBlock value={proj.description} onSave={onUpdate ? (v) => {
+                upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, description: v } : p) });
+              } : undefined} />
+              <E value={proj.technologies.join(", ")} small muted onSave={onUpdate ? (v) => {
+                upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, technologies: v.split(",").map((t) => t.trim()).filter(Boolean) } : p) });
+              } : undefined} />
+            </div>
           ))}
         </Section>
       )}
@@ -126,18 +170,23 @@ export default function ResumePreview({ resume, onUpdate, fontStyle = "serif" }:
       {resume.education?.length > 0 && (
         <Section title="Education">
           {resume.education.map((ed, i) => (
-            <div key={i} className="flex justify-between items-baseline">
-              <div>
-                <span className="font-bold text-gray-900">{ed.school}</span>
-                <span className="text-gray-600">
-                  {" "}
-                  — {ed.degree} in {ed.field}
-                  {ed.gpa && ` · GPA: ${ed.gpa}`}
-                </span>
+            <div key={i} className="flex flex-wrap justify-between items-baseline mb-1 gap-x-1">
+              <div className="flex flex-wrap items-baseline gap-x-1">
+                <E value={ed.school} bold onSave={onUpdate ? (v) => {
+                  upd({ education: resume.education.map((e, j) => j === i ? { ...e, school: v } : e) });
+                } : undefined} />
+                <span className="text-gray-500"> — </span>
+                <E value={ed.degree} onSave={onUpdate ? (v) => {
+                  upd({ education: resume.education.map((e, j) => j === i ? { ...e, degree: v } : e) });
+                } : undefined} />
+                <span className="text-gray-500"> in </span>
+                <E value={ed.field} onSave={onUpdate ? (v) => {
+                  upd({ education: resume.education.map((e, j) => j === i ? { ...e, field: v } : e) });
+                } : undefined} />
               </div>
-              <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                {ed.graduationDate}
-              </span>
+              <E value={ed.graduationDate} small muted onSave={onUpdate ? (v) => {
+                upd({ education: resume.education.map((e, j) => j === i ? { ...e, graduationDate: v } : e) });
+              } : undefined} />
             </div>
           ))}
         </Section>
@@ -146,47 +195,23 @@ export default function ResumePreview({ resume, onUpdate, fontStyle = "serif" }:
   );
 }
 
-function Section({
-  title,
-  children,
+/* ── Inline editable single-line ── */
+function E({
+  value, bold, small, muted, wide, onSave, onDelete,
 }: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="mb-4">
-      <h2 className="text-xs font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-0.5 mb-2">
-        {title}
-      </h2>
-      {children}
-    </div>
-  );
-}
-
-function SkillRow({ label, items }: { label: string; items: string[] }) {
-  return (
-    <p className="text-gray-700">
-      <span className="font-semibold">{label}: </span>
-      {items.join(", ")}
-    </p>
-  );
-}
-
-function EditableText({
-  value,
-  bold,
-  onSave,
-}: {
-  value: string;
-  bold?: boolean;
-  onSave?: (val: string) => void;
+  value: string; bold?: boolean; small?: boolean; muted?: boolean; wide?: boolean;
+  onSave?: (v: string) => void; onDelete?: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
 
-  if (!onSave) {
-    return <span className={bold ? "font-bold text-gray-900" : "text-gray-600"}>{value}</span>;
-  }
+  const cls = [
+    bold ? "font-bold text-gray-900" : "",
+    small ? "text-xs" : "",
+    muted ? "text-gray-500" : (!bold ? "text-gray-700" : ""),
+  ].filter(Boolean).join(" ");
+
+  if (!onSave) return <span className={cls}>{value}</span>;
 
   if (editing) {
     return (
@@ -199,18 +224,19 @@ function EditableText({
             if (e.key === "Enter") { onSave(draft.trim()); setEditing(false); }
             if (e.key === "Escape") setEditing(false);
           }}
-          className={`border border-blue-400 rounded px-1 py-0 text-sm outline-none text-gray-800 ${bold ? "font-bold" : ""}`}
-          style={{ width: `${Math.max(draft.length, 10)}ch` }}
+          className={`border border-blue-400 rounded px-1 py-0 outline-none text-gray-800 ${bold ? "font-bold" : ""} ${small ? "text-xs" : "text-sm"}`}
+          style={{ width: wide ? "100%" : `${Math.max((draft.length || 8) + 2, 8)}ch`, minWidth: "6ch" }}
         />
-        <button onClick={() => { onSave(draft.trim()); setEditing(false); }} className="text-green-600 hover:text-green-700"><Check size={12} /></button>
-        <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600"><X size={12} /></button>
+        <button onClick={() => { onSave(draft.trim()); setEditing(false); }} className="text-green-600 hover:text-green-700 flex-shrink-0"><Check size={11} /></button>
+        <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600 flex-shrink-0"><X size={11} /></button>
+        {onDelete && <button onClick={onDelete} className="text-red-400 hover:text-red-600 flex-shrink-0"><Trash2 size={11} /></button>}
       </span>
     );
   }
 
   return (
     <span
-      className={`cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors ${bold ? "font-bold text-gray-900" : "text-gray-600"}`}
+      className={`cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors ${cls}`}
       title="Click to edit"
       onClick={() => { setDraft(value); setEditing(true); }}
     >
@@ -219,73 +245,124 @@ function EditableText({
   );
 }
 
-function ProjectCard({
-  proj,
-  onUrlChange,
-}: {
-  proj: { name: string; description: string; technologies: string[]; url?: string };
-  onUrlChange?: (url: string) => void;
-}) {
+/* ── Multiline editable block (textarea) ── */
+function EBlock({ value, onSave }: { value: string; onSave?: (v: string) => void }) {
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(proj.url ?? "");
+  const [draft, setDraft] = useState(value);
 
-  function confirm() {
-    onUrlChange?.(draft.trim());
-    setEditing(false);
+  if (!onSave) return <p className="text-gray-700">{value}</p>;
+
+  if (editing) {
+    return (
+      <div className="flex flex-col gap-1">
+        <textarea
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          rows={4}
+          className="w-full border border-blue-400 rounded px-2 py-1 text-sm outline-none text-gray-800 resize-y"
+        />
+        <div className="flex gap-2">
+          <button onClick={() => { onSave(draft.trim()); setEditing(false); }} className="text-xs text-green-600 hover:text-green-700 flex items-center gap-1"><Check size={11} /> Save</button>
+          <button onClick={() => setEditing(false)} className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"><X size={11} /> Cancel</button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="mb-3">
-      <div className="flex justify-between items-start gap-2">
-        <span className="font-bold text-gray-900">{proj.name}</span>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          {editing ? (
-            <>
-              <input
-                autoFocus
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") confirm();
-                  if (e.key === "Escape") setEditing(false);
-                }}
-                placeholder="https://..."
-                className="text-xs border border-blue-400 rounded px-1.5 py-0.5 w-52 outline-none text-gray-800"
-              />
-              <button onClick={confirm} className="text-green-600 hover:text-green-700">
-                <Check size={13} />
-              </button>
-              <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={13} />
-              </button>
-            </>
-          ) : (
-            <>
-              {proj.url ? (
-                <a
-                  href={proj.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-blue-600 hover:underline"
-                >
-                  {proj.url}
-                </a>
-              ) : null}
-              {onUrlChange && (
-                <button
-                  onClick={() => { setDraft(proj.url ?? ""); setEditing(true); }}
-                  className="text-gray-400 hover:text-blue-500 transition-colors"
-                  title="Edit project link"
-                >
-                  {proj.url ? <Pencil size={11} /> : <Link2 size={13} />}
-                </button>
-              )}
-            </>
-          )}
-        </div>
+    <p
+      className="text-gray-700 cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors"
+      title="Click to edit"
+      onClick={() => { setDraft(value); setEditing(true); }}
+    >
+      {value}
+    </p>
+  );
+}
+
+/* ── Editable skill row ── */
+function EditableSkillRow({ label, items, onSave }: {
+  label: string; items: string[]; onSave?: (label: string, items: string[]) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draftLabel, setDraftLabel] = useState(label);
+  const [draftItems, setDraftItems] = useState(items.join(", "));
+
+  if (!onSave) {
+    return (
+      <p className="text-gray-700">
+        <span className="font-semibold">{label}: </span>{items.join(", ")}
+      </p>
+    );
+  }
+
+  if (editing) {
+    return (
+      <div className="flex gap-1 items-center mb-1">
+        <input value={draftLabel} onChange={(e) => setDraftLabel(e.target.value)}
+          className="border border-blue-400 rounded px-1 py-0 text-xs font-semibold outline-none text-gray-800 w-28" placeholder="Category" />
+        <span className="text-gray-500 text-xs">:</span>
+        <input autoFocus value={draftItems} onChange={(e) => setDraftItems(e.target.value)}
+          className="border border-blue-400 rounded px-1 py-0 text-xs outline-none text-gray-800 flex-1"
+          placeholder="skill1, skill2, ..."
+          onKeyDown={(e) => {
+            if (e.key === "Enter") { onSave(draftLabel.trim(), draftItems.split(",").map((s) => s.trim()).filter(Boolean)); setEditing(false); }
+            if (e.key === "Escape") setEditing(false);
+          }} />
+        <button onClick={() => { onSave(draftLabel.trim(), draftItems.split(",").map((s) => s.trim()).filter(Boolean)); setEditing(false); }} className="text-green-600 hover:text-green-700"><Check size={12} /></button>
+        <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600"><X size={12} /></button>
       </div>
-      <p className="text-gray-700 mb-0.5">{proj.description}</p>
-      <p className="text-xs text-gray-500">{proj.technologies.join(" · ")}</p>
+    );
+  }
+
+  return (
+    <p className="text-gray-700 cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors" title="Click to edit"
+      onClick={() => { setDraftLabel(label); setDraftItems(items.join(", ")); setEditing(true); }}>
+      <span className="font-semibold">{label}: </span>{items.join(", ")}
+    </p>
+  );
+}
+
+/* ── Project URL editor ── */
+function ProjectUrlEditor({ url, onSave }: { url?: string; onSave?: (url: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(url ?? "");
+
+  if (!onSave) {
+    return url ? <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">{url}</a> : null;
+  }
+
+  if (editing) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <input autoFocus value={draft} onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") { onSave(draft.trim()); setEditing(false); }
+            if (e.key === "Escape") setEditing(false);
+          }}
+          placeholder="https://..." className="text-xs border border-blue-400 rounded px-1.5 py-0.5 w-52 outline-none text-gray-800" />
+        <button onClick={() => { onSave(draft.trim()); setEditing(false); }} className="text-green-600 hover:text-green-700"><Check size={12} /></button>
+        <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600"><X size={12} /></button>
+      </span>
+    );
+  }
+
+  return (
+    <span className="flex items-center gap-1 flex-shrink-0">
+      {url && <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">{url}</a>}
+      <button onClick={() => { setDraft(url ?? ""); setEditing(true); }} className="text-gray-400 hover:text-blue-500 transition-colors" title="Edit link">
+        {url ? <Pencil size={11} /> : <Link2 size={13} />}
+      </button>
+    </span>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-4">
+      <h2 className="text-xs font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-0.5 mb-2">{title}</h2>
+      {children}
     </div>
   );
 }

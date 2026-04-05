@@ -14,9 +14,9 @@ import { useState } from "react";
 import { Resume } from "@/types/resume";
 import { Download, Pencil, Check } from "lucide-react";
 
-function makeStyles(font: "serif" | "sans") {
-  const base = font === "serif" ? "Times-Roman" : "Helvetica";
-  const bold = font === "serif" ? "Times-Bold" : "Helvetica-Bold";
+function makeStyles(font: "serif" | "sans" | "mono") {
+  const base = font === "serif" ? "Times-Roman" : font === "mono" ? "Courier" : "Helvetica";
+  const bold = font === "serif" ? "Times-Bold" : font === "mono" ? "Courier-Bold" : "Helvetica-Bold";
   return StyleSheet.create({
     page: { padding: 40, fontSize: 10, fontFamily: base, color: "#111111", lineHeight: 1.4 },
     header: { textAlign: "center", marginBottom: 10, borderBottomWidth: 1.5, borderBottomColor: "#111111", paddingBottom: 8 },
@@ -44,7 +44,7 @@ function makeStyles(font: "serif" | "sans") {
   });
 }
 
-function ResumePDFDoc({ resume, fontStyle = "serif" }: { resume: Resume; fontStyle?: "serif" | "sans" }) {
+function ResumePDFDoc({ resume, fontStyle = "serif" }: { resume: Resume; fontStyle?: "serif" | "sans" | "mono" }) {
   const styles = makeStyles(fontStyle);
   return (
     <Document>
@@ -179,7 +179,7 @@ function ResumePDFDoc({ resume, fontStyle = "serif" }: { resume: Resume; fontSty
   );
 }
 
-export default function PDFExportButton({ resume, fontStyle = "serif" }: { resume: Resume; fontStyle?: "serif" | "sans" }) {
+export default function PDFExportButton({ resume, fontStyle = "serif" }: { resume: Resume; fontStyle?: "serif" | "sans" | "mono" }) {
   const defaultName = `${resume.name.replace(/\s+/g, "_")}_Resume`;
   const [basename, setBasename] = useState(defaultName);
   const [editing, setEditing] = useState(false);
