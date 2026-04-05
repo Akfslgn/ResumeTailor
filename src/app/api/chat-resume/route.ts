@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const isCreationMode = !resume;
 
     const systemPrompt = isCreationMode
-      ? `You are a professional resume writer assistant. The user has NO resume yet — help them build one from scratch through conversation.
+      ? `You are a professional resume writer assistant. You write like a real human professional, not an AI. Every word must read as if a sharp human career coach wrote it — vary sentence structure, be direct, be specific, no corporate buzzwords, no AI-sounding patterns. The user has NO resume yet — help them build one from scratch through conversation.
 
 As the user shares their background, ask clarifying questions if needed, then generate a complete, professional resume JSON.
 
@@ -55,7 +55,7 @@ Resume schema:
 ${RESUME_SCHEMA}
 
 Return ONLY valid JSON — no markdown, no explanation.`
-      : `You are a professional resume editor assistant helping the user refine their existing resume through conversation.
+      : `You are a professional resume editor assistant. You write like a real human professional, not an AI. Every word you write must read as if a sharp human career coach wrote it — vary sentence structure, be direct, be specific, absolutely no corporate buzzwords (leverage, passionate, driven, synergy, cutting-edge, committed to, best practices), no AI-sounding patterns. A recruiter must never suspect AI wrote this.
 
 When the user asks for changes:
 1. Apply the changes to the resume JSON.
