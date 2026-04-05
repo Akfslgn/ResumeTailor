@@ -8,6 +8,7 @@ import {
   StyleSheet,
   PDFDownloadLink,
   Font,
+  Link,
 } from "@react-pdf/renderer";
 import { useState } from "react";
 import { Resume } from "@/types/resume";
@@ -155,13 +156,19 @@ function ResumePDFDoc({ resume }: { resume: Resume }) {
               <Text style={styles.contactItem}>{resume.location}</Text>
             )}
             {resume.linkedin && (
-              <Text style={styles.contactItem}>{resume.linkedin}</Text>
+              <Link src={resume.linkedin.startsWith("http") ? resume.linkedin : `https://${resume.linkedin}`} style={styles.contactItem}>
+                {resume.linkedin}
+              </Link>
             )}
             {resume.github && (
-              <Text style={styles.contactItem}>{resume.github}</Text>
+              <Link src={resume.github.startsWith("http") ? resume.github : `https://${resume.github}`} style={styles.contactItem}>
+                {resume.github}
+              </Link>
             )}
             {resume.website && (
-              <Text style={styles.contactItem}>{resume.website}</Text>
+              <Link src={resume.website.startsWith("http") ? resume.website : `https://${resume.website}`} style={styles.contactItem}>
+                {resume.website}
+              </Link>
             )}
           </View>
         </View>
@@ -225,7 +232,9 @@ function ResumePDFDoc({ resume }: { resume: Resume }) {
                 <View style={styles.projectHeader}>
                   <Text style={styles.projectName}>{proj.name}</Text>
                   {proj.url && (
-                    <Text style={styles.projectUrl}>{proj.url}</Text>
+                    <Link src={proj.url} style={{ fontSize: 8, color: "#2563eb", textDecoration: "underline" }}>
+                      {proj.url}
+                    </Link>
                   )}
                 </View>
                 <Text style={styles.projectDesc}>{proj.description}</Text>
