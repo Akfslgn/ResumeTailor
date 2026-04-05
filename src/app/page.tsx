@@ -452,7 +452,18 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              displayedResume && <ResumePreview resume={displayedResume} />
+              displayedResume && (
+                <ResumePreview
+                  resume={displayedResume}
+                  onUpdate={(updated) => {
+                    if (activeTab === "tailored") {
+                      setTailoredResume(updated);
+                    } else {
+                      setOriginalResume(updated);
+                    }
+                  }}
+                />
+              )
             )}
           </div>
         </div>

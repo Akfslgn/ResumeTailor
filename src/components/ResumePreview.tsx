@@ -1,10 +1,14 @@
+"use client";
+import { useState } from "react";
+import { Link2, Pencil, Check, X } from "lucide-react";
 import { Resume } from "@/types/resume";
 
 interface Props {
   resume: Resume;
+  onUpdate?: (updated: Resume) => void;
 }
 
-export default function ResumePreview({ resume }: Props) {
+export default function ResumePreview({ resume, onUpdate }: Props) {
   return (
     <div
       id="resume-preview"
@@ -85,25 +89,19 @@ export default function ResumePreview({ resume }: Props) {
       {resume.projects?.length > 0 && (
         <Section title="Projects">
           {resume.projects.map((proj, i) => (
-            <div key={i} className="mb-3">
-              <div className="flex justify-between items-baseline">
-                <span className="font-bold text-gray-900">{proj.name}</span>
-                {proj.url && (
-                  <a
-                    href={proj.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-blue-600 hover:underline"
-                  >
-                    {proj.url}
-                  </a>
-                )}
-              </div>
-              <p className="text-gray-700 mb-0.5">{proj.description}</p>
-              <p className="text-xs text-gray-500">
-                {proj.technologies.join(" · ")}
-              </p>
-            </div>
+            <ProjectCard
+              key={i}
+              proj={proj}
+              onUrlChange={onUpdate ? (url) => {
+                const updated = {
+                  ...resume,
+                  projects: resume.projects.map((p, j) =>
+                    j === i ? { ...p, url } : p
+                  ),
+                };
+                onUpdate(updated);
+              } : undefined}
+            />
           ))}
         </Section>
       )}
@@ -155,5 +153,76 @@ function SkillRow({ label, items }: { label: string; items: string[] }) {
       <span className="font-semibold">{label}: </span>
       {items.join(", ")}
     </p>
+  );
+}
+
+function ProjectCard({
+  proj,
+  onUrlChange,
+}: {
+  proj: { name: string; description: string; technologies: string[]; url?: string };
+  onUrlChange?: (url: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(proj.url ?? "");
+
+  function confirm() {
+    onUrlChange?.(draft.trim());
+    setEditing(false);
+  }
+
+  return (
+    <div className="mb-3">
+      <div className="flex justify-between items-start gap-2">
+        <span className="font-bold text-gray-900">{proj.name}</span>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {editing ? (
+            <>
+              <input
+                autoFocus
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") confirm();
+                  if (e.key === "Escape") setEditing(false);
+                }}
+                placeholder="https://..."
+                className="text-xs border border-blue-400 rounded px-1.5 py-0.5 w-52 outline-none text-gray-800"
+              />
+              <button onClick={confirm} className="text-green-600 hover:text-green-700">
+                <Check size={13} />
+              </button>
+              <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={13} />
+              </button>
+            </>
+          ) : (
+            <>
+              {proj.url ? (
+                <a
+                  href={proj.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 hover:underline"
+                >
+                  {proj.url}
+                </a>
+              ) : null}
+              {onUrlChange && (
+                <button
+                  onClick={() => { setDraft(proj.url ?? ""); setEditing(true); }}
+                  className="text-gray-400 hover:text-blue-500 transition-colors"
+                  title="Edit project link"
+                >
+                  {proj.url ? <Pencil size={11} /> : <Link2 size={13} />}
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+      <p className="text-gray-700 mb-0.5">{proj.description}</p>
+      <p className="text-xs text-gray-500">{proj.technologies.join(" · ")}</p>
+    </div>
   );
 }
