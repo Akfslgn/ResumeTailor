@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PDFParse } from "pdf-parse";
 
 export const runtime = "nodejs";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const mammoth = require("mammoth");
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -44,16 +41,34 @@ export async function POST(req: NextRequest) {
     let text = "";
 
     if (file.type === "application/pdf") {
-      const parser = new PDFParse({ data: buffer });
-      const result = await parser.getText();
-      text = result.text;
+      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs" as string);
+      // Disable worker for server-side usage
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (pdfjsLib as any).GlobalWorkerOptions.workerSrc = "";
+      const data = new Uint8Array(buffer);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const loadingTask = (pdfjsLib as any).getDocument({ data });
+      const pdfDoc = await loadingTask.promise;
+      const pages: string[] = [];
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        const page = await pdfDoc.getPage(i);
+        const content = await page.getTextContent();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pageText = content.items.map((item: any) => item.str ?? "").join(" ");
+        pages.push(pageText);
+      }
+      text = pages.join("\n");
     } else if (
       file.type ===
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mammoth = require("mammoth");
       const result = await mammoth.extractRawText({ buffer });
       text = result.value;
     } else if (file.type === "application/msword") {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mammoth = require("mammoth");
       // Older .doc format — mammoth has limited support, try and fallback
       try {
         const result = await mammoth.extractRawText({ buffer });

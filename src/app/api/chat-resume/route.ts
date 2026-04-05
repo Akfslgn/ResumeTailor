@@ -28,7 +28,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing messages." }, { status: 400 });
     }
     if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: "OpenAI API key not configured." }, { status: 500 });
+      return NextResponse.json(
+        { error: "OpenAI API key not configured." },
+        { status: 500 },
+      );
     }
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
