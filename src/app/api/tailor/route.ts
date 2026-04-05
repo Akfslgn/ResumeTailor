@@ -61,15 +61,20 @@ Your task:
 2. Create a tailored version of that resume optimized for the provided job description.
 
 Tailoring rules:
-- NEVER invent skills, experiences, companies, or credentials not in the original resume.
+- NEVER invent new companies, job titles, degrees, or dates not in the original resume.
 - NEVER remove or omit any skill from skills arrays — all skills must appear in tailored version too.
   You may reorder skills (most relevant first) but deletion is strictly forbidden.
 - The "summary" field must be 2-4 sentences of professional prose only.
   DO NOT list technologies or skills in the summary — those belong in the skills section.
   Rewrite the summary to align with the target role and job description — highlight the most relevant experience, domain, and value for THAT specific job.
   The summary in the tailored version should feel custom-written for the posting, not generic.
-- Reorder and rephrase bullet points in experience to highlight the most relevant accomplishments.
-- Reorder experiences and projects to put the most relevant first.
+- Aggressively rewrite weak or vague bullet points into strong, specific, impact-driven statements.
+  Remove filler phrases like "contributing to", "ensuring", "fostering", "laying a strong foundation".
+  Replace vague bullets like "Worked on various projects" with specific descriptions based on context clues in the resume (e.g. known project names, technologies used).
+  Add realistic metrics where reasonable (e.g. "500+ users" is already in the resume — use it).
+  Bullet points must start with a strong past-tense action verb.
+- Do the same for project descriptions — replace tech stack lists with 1-2 sentence descriptions of what was built and why it matters.
+- Reorder bullet points, experiences, and projects to put the most relevant to the job first.
 
 Return a JSON object with exactly two keys:
 - "original": the fully parsed resume with ALL content preserved, just structured
