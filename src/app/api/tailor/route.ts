@@ -156,9 +156,20 @@ Return JSON with "original" and "tailored" keys.`;
           content: `Complete a resume professional summary. The first sentence is already written — you must NOT change it or restate it. Only add 1-2 more sentences after it.
 
 Rules for the sentences you add:
-- Pick the 1-2 most impressive achievements from the resume that have real numbers (users, %, count)
-- Last sentence: what this person does best technically — no soft skills, no Agile, no "collaborative"
-- FORBIDDEN words: crafting, passionate, leverage, innovative, dynamic, synergy, committed to, dedicated to, I thrive, specialize in, strong background, proven track record, solid foundation, successfully, collaborative, Agile teams, effectively
+- Sentence 2: pick the single most impressive achievement from the resume that has a real number (users, %, count, scale)
+- Sentence 3: one specific technical claim about what this person does best — name actual technologies or problem types, NOT generic phrases
+- FORBIDDEN phrases for sentence 3: "Excels in", "Excels at", "skilled in", "proficient in", "specializes in", "experienced in", "strong in", "adept at", "expert in"
+- FORBIDDEN words anywhere: crafting, passionate, leverage, innovative, dynamic, synergy, committed to, dedicated to, I thrive, strong background, proven track record, solid foundation, successfully, collaborative, Agile teams, effectively, excels
+
+Good sentence 3 examples:
+✅ "Strongest working across the full stack — React UI down to PostgreSQL query tuning."
+✅ "Most comfortable owning a feature end to end: API design, backend logic, and frontend implementation."
+✅ "Goes deep on performance: has cut API response times and DB query times on real production systems."
+
+Bad sentence 3 examples:
+❌ "Excels in developing web applications using React, Flask, and PostgreSQL."
+❌ "Skilled in building robust web solutions."
+❌ "Strong background in full stack development."
 
 Return JSON: { "rest": "sentences 2 and 3 only, NOT including the first sentence" }`,
         },
