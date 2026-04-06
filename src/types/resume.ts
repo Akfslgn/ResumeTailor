@@ -22,6 +22,11 @@ export interface ResumeProject {
   url?: string;
 }
 
+export interface CustomSection {
+  title: string;
+  items: string[];
+}
+
 export interface Resume {
   name: string;
   email: string;
@@ -35,6 +40,7 @@ export interface Resume {
   experience: ResumeExperience[];
   education: ResumeEducation[];
   projects: ResumeProject[];
+  customSections?: Record<string, CustomSection>;
   sectionTitles?: Record<string, string>;
   sectionOrder?: string[];
 }

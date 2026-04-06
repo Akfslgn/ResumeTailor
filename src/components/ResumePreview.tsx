@@ -225,8 +225,44 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
             )}
           </EditableSection>
         );
-      default:
-        return null;
+      default: {
+        // Custom section
+        const custom = resume.customSections?.[key];
+        if (!custom && !onUpdate) return null;
+        const items = custom?.items ?? [];
+        return (
+          <EditableSection key={key} sectionKey={key} title={title} onTitleChange={onUpdate ? (v) => setSectionTitle(key, v) : undefined} onDelete={onUpdate ? () => {
+            const newCustom = { ...resume.customSections };
+            delete newCustom[key];
+            upd({ sectionOrder: sectionOrder.filter(s => s !== key), customSections: newCustom });
+          } : undefined} editable={!!onUpdate}>
+            {items.map((item, i) => (
+              <div key={i} className="flex items-start gap-1 group/citem">
+                {onUpdate && (
+                  <button onClick={() => {
+                    const newItems = items.filter((_, j) => j !== i);
+                    upd({ customSections: { ...resume.customSections, [key]: { ...custom!, items: newItems } } });
+                  }} className="opacity-0 group-hover/citem:opacity-100 text-red-400 hover:text-red-600 mt-0.5 flex-shrink-0">
+                    <Trash2 size={11} />
+                  </button>
+                )}
+                <span className="text-gray-400 mt-0.5 flex-shrink-0">•</span>
+                <E value={item} onSave={onUpdate ? (v) => {
+                  const newItems = [...items];
+                  newItems[i] = v;
+                  upd({ customSections: { ...resume.customSections, [key]: { ...custom!, items: newItems } } });
+                } : undefined} />
+              </div>
+            ))}
+            {onUpdate && (
+              <button onClick={() => upd({ customSections: { ...resume.customSections, [key]: { title: title, items: [...items, "New item"] } } })}
+                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1">
+                <Plus size={11} /> Add item
+              </button>
+            )}
+          </EditableSection>
+        );
+      }
     }
   }
 
@@ -274,7 +310,18 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
         {/* Add section button */}
         {onUpdate && (
           <div className="mt-2 flex items-center gap-2">
-            <AddSectionButton currentOrder={sectionOrder} onAdd={(key) => upd({ sectionOrder: [...sectionOrder, key] })} />
+            <AddSectionButton
+              currentOrder={sectionOrder}
+              onAdd={(key) => upd({ sectionOrder: [...sectionOrder, key] })}
+              onAddCustom={(name) => {
+                const key = `custom_${Date.now()}`;
+                upd({
+                  sectionOrder: [...sectionOrder, key],
+                  sectionTitles: { ...sectionTitles, [key]: name },
+                  customSections: { ...resume.customSections, [key]: { title: name, items: ["New item"] } },
+                });
+              }}
+            />
           </div>
         )}
       </div>
@@ -335,23 +382,36 @@ function EditableSection({ sectionKey, title, children, onTitleChange, onDelete,
 }
 
 /* ── Add section button ── */
-function AddSectionButton({ currentOrder, onAdd }: { currentOrder: string[]; onAdd: (key: string) => void }) {
+function AddSectionButton({ currentOrder, onAdd, onAddCustom }: { currentOrder: string[]; onAdd: (key: string) => void; onAddCustom: (name: string) => void }) {
   const missing = DEFAULT_ORDER.filter(k => !currentOrder.includes(k));
   const [open, setOpen] = useState(false);
-  if (missing.length === 0) return null;
+  const [customName, setCustomName] = useState("");
   return (
     <div className="relative">
       <button onClick={() => setOpen(!open)} className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1">
         <Plus size={11} /> Add section
       </button>
       {open && (
-        <div className="absolute bottom-full mb-1 left-0 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10">
+        <div className="absolute bottom-full mb-1 left-0 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[200px]">
           {missing.map(key => (
             <button key={key} onClick={() => { onAdd(key); setOpen(false); }}
               className="block w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-blue-50 whitespace-nowrap">
               {DEFAULT_TITLES[key] ?? key}
             </button>
           ))}
+          <div className="border-t border-gray-100 mt-1 pt-1 px-2 pb-1">
+            <form onSubmit={(e) => { e.preventDefault(); if (customName.trim()) { onAddCustom(customName.trim()); setCustomName(""); setOpen(false); } }} className="flex gap-1">
+              <input
+                type="text" placeholder="Custom section name..."
+                value={customName} onChange={(e) => setCustomName(e.target.value)}
+                className="flex-1 text-xs border border-gray-200 rounded px-2 py-1 outline-none focus:border-blue-400"
+                autoFocus
+              />
+              <button type="submit" className="text-xs text-white bg-blue-500 hover:bg-blue-600 rounded px-2 py-1">
+                Add
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>
