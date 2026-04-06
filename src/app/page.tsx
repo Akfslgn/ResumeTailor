@@ -189,7 +189,21 @@ export default function Home() {
       if (!res.ok) throw new Error(data.error || "Failed to parse file.");
       setResumeText(data.text);
       setUploadedFileName(file.name);
-      toast.success(`"${file.name}" loaded successfully.`);
+
+      // Auto-parse into structured Resume for immediate preview
+      const structRes = await fetch("/api/parse-resume-structured", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeText: data.text }),
+      });
+      const structData = await structRes.json();
+      if (structRes.ok && structData.resume) {
+        setOriginalResume(structData.resume);
+        setActiveTab("original");
+        toast.success(`"${file.name}" loaded and parsed successfully.`);
+      } else {
+        toast.success(`"${file.name}" loaded successfully.`);
+      }
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed to read file.");
     } finally {
