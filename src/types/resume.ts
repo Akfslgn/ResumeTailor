@@ -35,4 +35,6 @@ export interface Resume {
   experience: ResumeExperience[];
   education: ResumeEducation[];
   projects: ResumeProject[];
+  sectionTitles?: Record<string, string>;
+  sectionOrder?: string[];
 }
