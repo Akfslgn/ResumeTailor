@@ -181,20 +181,21 @@ Return JSON with "original" and "tailored" keys.`;
           content: `Complete a resume professional summary. The first sentence is already written — you must NOT change it or restate it. Only add 1-2 more sentences after it.
 
 Rules for the sentences you add:
-- Sentence 2: pick the single most impressive achievement from the resume that has a real number (users, %, count, scale)
-- Sentence 3: one specific technical claim about what this person does best — name actual technologies or problem types, NOT generic phrases
-- FORBIDDEN phrases for sentence 3: "Excels in", "Excels at", "skilled in", "proficient in", "specializes in", "experienced in", "strong in", "adept at", "expert in"
-- FORBIDDEN words anywhere: crafting, passionate, leverage, innovative, dynamic, synergy, committed to, dedicated to, I thrive, strong background, proven track record, solid foundation, successfully, collaborative, Agile teams, effectively, excels
+- Focus ONLY on technologies, tools, frameworks, and type of work — NOT specific projects, company names, or metrics
+- Sentence 2: what kind of development work this person focuses on, mentioning the technologies that match the job description
+- Sentence 3 (optional): background in another area, willingness to grow, or work authorization
+- NEVER mention project names, company names, or numbers like "500+ users" or "30% faster" — those belong in experience bullets only
+- NEVER use: passionate, leverage, innovative, dynamic, synergy, committed to, dedicated to, proven track record, excels in, excels at, skilled in, proficient in, specializes in, strong background, adept at
 
-Good sentence 3 examples:
-✅ "Strongest working across the full stack — React UI down to PostgreSQL query tuning."
-✅ "Most comfortable owning a feature end to end: API design, backend logic, and frontend implementation."
-✅ "Goes deep on performance: has cut API response times and DB query times on real production systems."
+Good examples:
+✅ "Focused on creating clean and user-friendly interfaces using React and Tailwind CSS. Background in full stack development and eager to continue growing in frontend technologies."
+✅ "Comfortable owning features end to end — from React components and REST APIs to PostgreSQL schema design. Also experienced with Docker, AWS, and CI/CD pipelines."
+✅ "Most productive working across the full stack with React, Flask, and PostgreSQL. Additional background in technical teaching and freelance development."
 
-Bad sentence 3 examples:
-❌ "Excels in developing web applications using React, Flask, and PostgreSQL."
-❌ "Skilled in building robust web solutions."
-❌ "Strong background in full stack development."
+Bad examples (NEVER write these):
+❌ "Built a university library web application serving 500+ users."
+❌ "At Diamond Ze, shipped a library platform and cut DB query times by 30%."
+❌ "Excels in developing web applications using modern frameworks."
 
 Return JSON: { "rest": "sentences 2 and 3 only, NOT including the first sentence" }`,
         },
@@ -202,11 +203,10 @@ Return JSON: { "rest": "sentences 2 and 3 only, NOT including the first sentence
           role: "user",
           content: `First sentence (already written, do not repeat): "${firstSentence}"
 
-Experience: ${JSON.stringify(parsed.original.experience)}
-Projects: ${JSON.stringify(parsed.original.projects)}
+Skills: ${JSON.stringify(parsed.original.skills)}
 Job target: ${jobDescription.slice(0, 800)}
 
-Write only the remaining 1-2 sentences.`,
+Write only the remaining 1-2 sentences focusing on technologies and type of work. NO project details, NO metrics.`,
         },
       ],
       response_format: { type: "json_object" },
