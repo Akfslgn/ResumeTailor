@@ -43,21 +43,31 @@ export default function Home() {
   });
   const [originalResume, setOriginalResume] = useState<Resume | null>(() => {
     if (typeof window === "undefined") return null;
-    try { return JSON.parse(sessionStorage.getItem("rt_original") ?? "null"); } catch { return null; }
+    try {
+      return JSON.parse(sessionStorage.getItem("rt_original") ?? "null");
+    } catch {
+      return null;
+    }
   });
   const [tailoredResume, setTailoredResume] = useState<Resume | null>(() => {
     if (typeof window === "undefined") return null;
-    try { return JSON.parse(sessionStorage.getItem("rt_tailored") ?? "null"); } catch { return null; }
+    try {
+      return JSON.parse(sessionStorage.getItem("rt_tailored") ?? "null");
+    } catch {
+      return null;
+    }
   });
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>(() => {
     if (typeof window === "undefined") return "original";
     return (sessionStorage.getItem("rt_activeTab") as Tab) ?? "original";
   });
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    return sessionStorage.getItem("rt_fileName") ?? null;
-  });
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(
+    () => {
+      if (typeof window === "undefined") return null;
+      return sessionStorage.getItem("rt_fileName") ?? null;
+    },
+  );
   const [parsing, setParsing] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -67,7 +77,9 @@ export default function Home() {
       const stored = localStorage.getItem("rt_settings");
       if (stored) return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
       // migrate old rt_font key
-      const oldFont = localStorage.getItem("rt_font") as ResumeSettings["fontStyle"] | null;
+      const oldFont = localStorage.getItem("rt_font") as
+        | ResumeSettings["fontStyle"]
+        | null;
       if (oldFont) return { ...DEFAULT_SETTINGS, fontStyle: oldFont };
     } catch {}
     return DEFAULT_SETTINGS;
@@ -75,12 +87,24 @@ export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Persist resume data for this session (clears when tab/browser is closed)
-  useEffect(() => { sessionStorage.setItem("rt_resumeText", resumeText); }, [resumeText]);
-  useEffect(() => { sessionStorage.setItem("rt_jobDescription", jobDescription); }, [jobDescription]);
-  useEffect(() => { sessionStorage.setItem("rt_original", JSON.stringify(originalResume)); }, [originalResume]);
-  useEffect(() => { sessionStorage.setItem("rt_tailored", JSON.stringify(tailoredResume)); }, [tailoredResume]);
-  useEffect(() => { sessionStorage.setItem("rt_activeTab", activeTab); }, [activeTab]);
-  useEffect(() => { sessionStorage.setItem("rt_fileName", uploadedFileName ?? ""); }, [uploadedFileName]);
+  useEffect(() => {
+    sessionStorage.setItem("rt_resumeText", resumeText);
+  }, [resumeText]);
+  useEffect(() => {
+    sessionStorage.setItem("rt_jobDescription", jobDescription);
+  }, [jobDescription]);
+  useEffect(() => {
+    sessionStorage.setItem("rt_original", JSON.stringify(originalResume));
+  }, [originalResume]);
+  useEffect(() => {
+    sessionStorage.setItem("rt_tailored", JSON.stringify(tailoredResume));
+  }, [tailoredResume]);
+  useEffect(() => {
+    sessionStorage.setItem("rt_activeTab", activeTab);
+  }, [activeTab]);
+  useEffect(() => {
+    sessionStorage.setItem("rt_fileName", uploadedFileName ?? "");
+  }, [uploadedFileName]);
   // Persist appearance settings permanently
   useEffect(() => {
     localStorage.setItem("rt_settings", JSON.stringify(settings));
@@ -185,21 +209,29 @@ export default function Home() {
       github: "",
       website: "",
       summary: "Write your professional summary here.",
-      skills: { "Languages": ["Skill 1", "Skill 2"], "Frameworks": ["Framework 1"], "Tools": ["Tool 1"] },
-      experience: [{
-        company: "Company Name",
-        title: "Job Title",
-        location: "City, State",
-        startDate: "Jan 2023",
-        endDate: "Present",
-        bullets: ["Describe what you did here"],
-      }],
-      education: [{
-        school: "University Name",
-        degree: "Bachelor of Science",
-        field: "Your Field",
-        graduationDate: "May 2022",
-      }],
+      skills: {
+        Languages: ["Skill 1", "Skill 2"],
+        Frameworks: ["Framework 1"],
+        Tools: ["Tool 1"],
+      },
+      experience: [
+        {
+          company: "Company Name",
+          title: "Job Title",
+          location: "City, State",
+          startDate: "Jan 2023",
+          endDate: "Present",
+          bullets: ["Describe what you did here"],
+        },
+      ],
+      education: [
+        {
+          school: "University Name",
+          degree: "Bachelor of Science",
+          field: "Your Field",
+          graduationDate: "May 2022",
+        },
+      ],
       projects: [],
     };
     setOriginalResume(blank);
@@ -462,7 +494,9 @@ export default function Home() {
               >
                 <Settings size={13} /> Appearance
               </button>
-              {displayedResume && <PDFExport resume={displayedResume} settings={settings} />}
+              {displayedResume && (
+                <PDFExport resume={displayedResume} settings={settings} />
+              )}
             </div>
           </div>
 

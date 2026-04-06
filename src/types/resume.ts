@@ -27,6 +27,16 @@ export interface CustomSection {
   items: string[];
 }
 
+export interface ElementStyle {
+  fontSize?: number;
+  fontFamily?: string;
+  fontWeight?: "normal" | "bold";
+  fontStyle?: "normal" | "italic";
+  textDecoration?: "none" | "underline";
+  textTransform?: "none" | "uppercase";
+  color?: string;
+}
+
 export interface Resume {
   name: string;
   email: string;
@@ -42,6 +52,7 @@ export interface Resume {
   education: ResumeEducation[];
   projects: ResumeProject[];
   customSections?: Record<string, CustomSection>;
+  styleOverrides?: Record<string, ElementStyle>;
   sectionTitles?: Record<string, string>;
   sectionOrder?: string[];
 }

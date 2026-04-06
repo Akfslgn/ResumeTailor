@@ -24,7 +24,10 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
           <div className="flex items-center gap-2 text-gray-800 font-semibold text-sm">
             <Settings size={15} /> Appearance
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
             <X size={16} />
           </button>
         </div>
@@ -35,17 +38,37 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
           <SettingSection label="Font Family">
             <ToggleGroup
               options={[
-                { value: "serif", label: "Serif", style: { fontFamily: "Georgia, serif" } },
-                { value: "sans",  label: "Sans",  style: { fontFamily: "Arial, sans-serif" } },
-                { value: "mono",  label: "Mono",  style: { fontFamily: "'Courier New', monospace" } },
+                {
+                  value: "serif",
+                  label: "Serif",
+                  style: { fontFamily: "Georgia, serif" },
+                },
+                {
+                  value: "sans",
+                  label: "Sans",
+                  style: { fontFamily: "Arial, sans-serif" },
+                },
+                {
+                  value: "mono",
+                  label: "Mono",
+                  style: { fontFamily: "'Courier New', monospace" },
+                },
               ]}
               value={settings.fontStyle}
-              onChange={(v) => set("fontStyle", v as ResumeSettings["fontStyle"])}
+              onChange={(v) =>
+                set("fontStyle", v as ResumeSettings["fontStyle"])
+              }
             />
             <p className="text-xs text-gray-400 mt-1.5">
-              {settings.fontStyle === "serif" ? "Georgia / Times New Roman — classic, formal" : ""}
-              {settings.fontStyle === "sans"  ? "Arial / Helvetica — clean, modern" : ""}
-              {settings.fontStyle === "mono"  ? "Courier New — technical, distinct" : ""}
+              {settings.fontStyle === "serif"
+                ? "Georgia / Times New Roman — classic, formal"
+                : ""}
+              {settings.fontStyle === "sans"
+                ? "Arial / Helvetica — clean, modern"
+                : ""}
+              {settings.fontStyle === "mono"
+                ? "Courier New — technical, distinct"
+                : ""}
             </p>
           </SettingSection>
 
@@ -53,9 +76,9 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
           <SettingSection label="Font Size">
             <ToggleGroup
               options={[
-                { value: "sm", label: "Small"  },
+                { value: "sm", label: "Small" },
                 { value: "md", label: "Medium" },
-                { value: "lg", label: "Large"  },
+                { value: "lg", label: "Large" },
               ]}
               value={settings.fontSize}
               onChange={(v) => set("fontSize", v as ResumeSettings["fontSize"])}
@@ -66,12 +89,14 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
           <SettingSection label="Line Spacing">
             <ToggleGroup
               options={[
-                { value: "tight",   label: "Compact" },
-                { value: "normal",  label: "Normal"  },
+                { value: "tight", label: "Compact" },
+                { value: "normal", label: "Normal" },
                 { value: "relaxed", label: "Relaxed" },
               ]}
               value={settings.lineHeight}
-              onChange={(v) => set("lineHeight", v as ResumeSettings["lineHeight"])}
+              onChange={(v) =>
+                set("lineHeight", v as ResumeSettings["lineHeight"])
+              }
             />
           </SettingSection>
 
@@ -80,9 +105,9 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
             <div className="grid grid-cols-4 gap-2">
               {(
                 [
-                  { value: "black",  color: "#111111", label: "Black"  },
-                  { value: "navy",   color: "#1e3a8a", label: "Navy"   },
-                  { value: "slate",  color: "#475569", label: "Slate"  },
+                  { value: "black", color: "#111111", label: "Black" },
+                  { value: "navy", color: "#1e3a8a", label: "Navy" },
+                  { value: "slate", color: "#475569", label: "Slate" },
                   { value: "forest", color: "#166534", label: "Forest" },
                 ] as const
               ).map(({ value, color, label }) => (
@@ -95,7 +120,10 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
                       : "border-gray-100 hover:border-gray-300 bg-gray-50"
                   }`}
                 >
-                  <div className="w-5 h-5 rounded-full shadow-sm" style={{ backgroundColor: color }} />
+                  <div
+                    className="w-5 h-5 rounded-full shadow-sm"
+                    style={{ backgroundColor: color }}
+                  />
                   <span className="text-xs text-gray-600">{label}</span>
                 </button>
               ))}
@@ -107,10 +135,12 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
             <ToggleGroup
               options={[
                 { value: "center", label: "Center" },
-                { value: "left",   label: "Left"   },
+                { value: "left", label: "Left" },
               ]}
               value={settings.headerAlign ?? "center"}
-              onChange={(v) => set("headerAlign", v as ResumeSettings["headerAlign"])}
+              onChange={(v) =>
+                set("headerAlign", v as ResumeSettings["headerAlign"])
+              }
             />
           </SettingSection>
 
@@ -134,15 +164,21 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
               <ToggleGroup
                 options={[
                   { value: "uppercase", label: "UPPERCASE" },
-                  { value: "normal",    label: "Normal" },
+                  { value: "normal", label: "Normal" },
                 ]}
                 value={settings.nameCase ?? "uppercase"}
-                onChange={(v) => set("nameCase", v as ResumeSettings["nameCase"])}
+                onChange={(v) =>
+                  set("nameCase", v as ResumeSettings["nameCase"])
+                }
               />
             </div>
             <label className="flex items-center gap-2 mt-2 text-xs text-gray-600 cursor-pointer">
-              <input type="checkbox" checked={settings.nameBold ?? true} onChange={(e) => set("nameBold", e.target.checked)}
-                className="rounded border-gray-300" />
+              <input
+                type="checkbox"
+                checked={settings.nameBold ?? true}
+                onChange={(e) => set("nameBold", e.target.checked)}
+                className="rounded border-gray-300"
+              />
               Bold name
             </label>
           </SettingSection>
@@ -152,10 +188,15 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
             <ToggleGroup
               options={[
                 { value: "uppercase", label: "UPPERCASE" },
-                { value: "normal",    label: "Normal" },
+                { value: "normal", label: "Normal" },
               ]}
               value={settings.sectionHeaderCase ?? "uppercase"}
-              onChange={(v) => set("sectionHeaderCase", v as ResumeSettings["sectionHeaderCase"])}
+              onChange={(v) =>
+                set(
+                  "sectionHeaderCase",
+                  v as ResumeSettings["sectionHeaderCase"],
+                )
+              }
             />
           </SettingSection>
 
@@ -169,10 +210,18 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
   );
 }
 
-function SettingSection({ label, children }: { label: string; children: React.ReactNode }) {
+function SettingSection({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{label}</p>
+      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+        {label}
+      </p>
       {children}
     </div>
   );

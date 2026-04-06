@@ -11,29 +11,91 @@ import {
   Link,
 } from "@react-pdf/renderer";
 import { useState } from "react";
-import { Resume } from "@/types/resume";
-import { ResumeSettings, DEFAULT_SETTINGS, fontSizePt, lineHeightPDF, nameSizePt, ACCENT } from "@/types/settings";
+import { Resume, ElementStyle } from "@/types/resume";
+import {
+  ResumeSettings,
+  DEFAULT_SETTINGS,
+  fontSizePt,
+  lineHeightPDF,
+  nameSizePt,
+  ACCENT,
+} from "@/types/settings";
 import { Download, Pencil, Check } from "lucide-react";
 
 function makeStyles(s: ResumeSettings) {
   const font = s.fontStyle;
-  const base = font === "serif" ? "Times-Roman" : font === "mono" ? "Courier" : "Helvetica";
-  const bold = font === "serif" ? "Times-Bold" : font === "mono" ? "Courier-Bold" : "Helvetica-Bold";
+  const base =
+    font === "serif"
+      ? "Times-Roman"
+      : font === "mono"
+        ? "Courier"
+        : "Helvetica";
+  const bold =
+    font === "serif"
+      ? "Times-Bold"
+      : font === "mono"
+        ? "Courier-Bold"
+        : "Helvetica-Bold";
   const fs = fontSizePt(s.fontSize);
   const lh = lineHeightPDF(s.lineHeight);
   const ac = ACCENT[s.accentColor];
   return {
     boldFont: bold,
     styles: StyleSheet.create({
-      page: { padding: 40, fontSize: fs, fontFamily: base, color: "#111111", lineHeight: lh },
-      header: { textAlign: s.headerAlign === "left" ? "left" : "center", marginBottom: 10, borderBottomWidth: 1.5, borderBottomColor: ac.pdfBorder, paddingBottom: 8 },
-      name: { fontSize: nameSizePt(s.nameSize ?? "lg"), fontFamily: (s.nameBold ?? true) ? bold : base, textTransform: (s.nameCase ?? "uppercase") === "uppercase" ? "uppercase" : "none", letterSpacing: 1.5, marginBottom: 4 },
-      contactRow: { flexDirection: "row", flexWrap: "wrap", justifyContent: s.headerAlign === "left" ? "flex-start" : "center", gap: 6, fontSize: fs * 0.9, color: "#444444", marginTop: 8 },
+      page: {
+        padding: 40,
+        fontSize: fs,
+        fontFamily: base,
+        color: "#111111",
+        lineHeight: lh,
+      },
+      header: {
+        textAlign: s.headerAlign === "left" ? "left" : "center",
+        marginBottom: 10,
+        borderBottomWidth: 1.5,
+        borderBottomColor: ac.pdfBorder,
+        paddingBottom: 8,
+      },
+      name: {
+        fontSize: nameSizePt(s.nameSize ?? "lg"),
+        fontFamily: (s.nameBold ?? true) ? bold : base,
+        textTransform:
+          (s.nameCase ?? "uppercase") === "uppercase" ? "uppercase" : "none",
+        letterSpacing: 1.5,
+        marginBottom: 4,
+      },
+      contactRow: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: s.headerAlign === "left" ? "flex-start" : "center",
+        gap: 6,
+        fontSize: fs * 0.9,
+        color: "#444444",
+        marginTop: 8,
+      },
       contactItem: { marginHorizontal: 4 },
-      sectionTitle: { fontSize: fs * 0.8, fontFamily: bold, textTransform: (s.sectionHeaderCase ?? "uppercase") === "uppercase" ? "uppercase" : "none", letterSpacing: 2, borderBottomWidth: 0.5, borderBottomColor: ac.pdfBorder, paddingBottom: 2, marginTop: 10, marginBottom: 4, color: ac.pdfTitle },
+      sectionTitle: {
+        fontSize: fs * 0.8,
+        fontFamily: bold,
+        textTransform:
+          (s.sectionHeaderCase ?? "uppercase") === "uppercase"
+            ? "uppercase"
+            : "none",
+        letterSpacing: 2,
+        borderBottomWidth: 0.5,
+        borderBottomColor: ac.pdfBorder,
+        paddingBottom: 2,
+        marginTop: 10,
+        marginBottom: 4,
+        color: ac.pdfTitle,
+      },
       skillRow: { flexDirection: "row", marginBottom: 2 },
       skillLabel: { fontFamily: bold, marginRight: 4, minWidth: 100 },
-      expHeader: { flexDirection: "row", justifyContent: "space-between", marginBottom: 1 },
+      expHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 1,
+      },
       expTitle: { fontFamily: bold },
       expCompany: { color: "#444444" },
       expDate: { fontSize: fs * 0.9, color: "#666666" },
@@ -55,24 +117,72 @@ function makeStyles(s: ResumeSettings) {
 
 // Renders text with **bold** markers as bold inline segments
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function RichText({ text, style, boldFont }: { text: string; style: any; boldFont: string }) {
+function RichText({
+  text,
+  style,
+  boldFont,
+}: {
+  text: string;
+  style: any;
+  boldFont: string;
+}) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   if (parts.length === 1) return <Text style={style}>{text}</Text>;
   return (
     <Text style={style}>
       {parts.map((part, i) =>
-        part.startsWith("**") && part.endsWith("**")
-          ? <Text key={i} style={{ fontFamily: boldFont }}>{part.slice(2, -2)}</Text>
-          : <Text key={i}>{part}</Text>
+        part.startsWith("**") && part.endsWith("**") ? (
+          <Text key={i} style={{ fontFamily: boldFont }}>
+            {part.slice(2, -2)}
+          </Text>
+        ) : (
+          <Text key={i}>{part}</Text>
+        ),
       )}
     </Text>
   );
 }
 
-function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume; settings?: ResumeSettings }) {
-  const { styles, boldFont } = makeStyles(settings);
+// Convert ElementStyle to react-pdf compatible style object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function pdfElemStyle(s: ElementStyle | undefined, boldFont: string, baseFont: string): any {
+  if (!s) return {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const out: any = {};
+  if (s.fontSize) out.fontSize = s.fontSize * 0.75; // px to pt approx
+  if (s.fontFamily) {
+    // Map CSS font-family to PDF font
+    if (s.fontFamily.includes("Arial") || s.fontFamily.includes("Helvetica") || s.fontFamily.includes("Verdana") || s.fontFamily.includes("Trebuchet")) out.fontFamily = "Helvetica";
+    else if (s.fontFamily.includes("Courier")) out.fontFamily = "Courier";
+    else if (s.fontFamily.includes("Georgia") || s.fontFamily.includes("Times")) out.fontFamily = "Times-Roman";
+  }
+  if (s.fontWeight === "bold") out.fontFamily = boldFont;
+  if (s.fontStyle === "italic") out.fontFamily = (out.fontFamily || baseFont) + "-Oblique";
+  if (s.textDecoration === "underline") out.textDecoration = "underline";
+  if (s.textTransform === "uppercase") out.textTransform = "uppercase";
+  if (s.color) out.color = s.color;
+  return out;
+}
 
-  const DEFAULT_ORDER = ["summary", "skills", "experience", "projects", "education"];
+function ResumePDFDoc({
+  resume,
+  settings = DEFAULT_SETTINGS,
+}: {
+  resume: Resume;
+  settings?: ResumeSettings;
+}) {
+  const { styles, boldFont } = makeStyles(settings);
+  const baseFont = settings.fontStyle === "serif" ? "Times-Roman" : settings.fontStyle === "mono" ? "Courier" : "Helvetica";
+  const so = resume.styleOverrides ?? {};
+  function es(key: string) { return pdfElemStyle(so[key], boldFont, baseFont); }
+
+  const DEFAULT_ORDER = [
+    "summary",
+    "skills",
+    "experience",
+    "projects",
+    "education",
+  ];
   const DEFAULT_TITLES: Record<string, string> = {
     summary: "Professional Summary",
     skills: "Technical Skills",
@@ -91,7 +201,11 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
         return (
           <View key={key}>
             <Text style={styles.sectionTitle}>{title}</Text>
-            <RichText text={resume.summary} style={{ color: "#333333" }} boldFont={boldFont} />
+            <RichText
+              text={resume.summary}
+              style={[{ color: "#333333" }, es("summary")]}
+              boldFont={boldFont}
+            />
           </View>
         );
       case "skills":
@@ -104,7 +218,7 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
                   <Text style={styles.skillLabel}>{label}:</Text>
                   <Text>{items.join(", ")}</Text>
                 </View>
-              ) : null
+              ) : null,
             )}
           </View>
         );
@@ -117,10 +231,10 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
               <View key={i} style={styles.mb3}>
                 <View style={styles.expHeader}>
                   <View style={{ flexDirection: "row" }}>
-                    <Text style={styles.expTitle}>{exp.title}</Text>
-                    <Text style={styles.expCompany}> — {exp.company}</Text>
+                    <Text style={[styles.expTitle, es("jobTitle")]}>{exp.title}</Text>
+                    <Text style={[styles.expCompany, es("company")]}> — {exp.company}</Text>
                   </View>
-                  <Text style={styles.expDate}>
+                  <Text style={[styles.expDate, es("date")]}>
                     {exp.startDate} – {exp.endDate}
                   </Text>
                 </View>
@@ -130,7 +244,11 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
                 {exp.bullets.map((b, j) => (
                   <View key={j} style={styles.bullet}>
                     <Text style={styles.bulletDot}>•</Text>
-                    <RichText text={b} style={styles.bulletText} boldFont={boldFont} />
+                    <RichText
+                      text={b}
+                      style={[styles.bulletText, es("bullet")]}
+                      boldFont={boldFont}
+                    />
                   </View>
                 ))}
               </View>
@@ -147,12 +265,23 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
                 <View style={styles.projectHeader}>
                   <Text style={styles.projectName}>{proj.name}</Text>
                   {proj.url && (
-                    <Link src={proj.url} style={{ fontSize: 8, color: "#2563eb", textDecoration: "underline" }}>
+                    <Link
+                      src={proj.url}
+                      style={{
+                        fontSize: 8,
+                        color: "#2563eb",
+                        textDecoration: "underline",
+                      }}
+                    >
                       {proj.url}
                     </Link>
                   )}
                 </View>
-                <RichText text={proj.description} style={styles.projectDesc} boldFont={boldFont} />
+                <RichText
+                  text={proj.description}
+                  style={styles.projectDesc}
+                  boldFont={boldFont}
+                />
                 <Text style={styles.projectTech}>
                   {proj.technologies.join(" · ")}
                 </Text>
@@ -169,7 +298,7 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
               <View key={i} style={styles.eduRow}>
                 <Text>
                   <Text style={styles.eduBold}>{ed.school}</Text>
-                    {ed.degree} in {ed.field}
+                  {ed.degree} in {ed.field}
                   {ed.gpa ? ` · GPA: ${ed.gpa}` : ""}
                 </Text>
                 <Text style={{ fontSize: 9, color: "#666666" }}>
@@ -188,7 +317,11 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
             {custom.items.map((item, i) => (
               <View key={i} style={styles.bullet}>
                 <Text style={styles.bulletDot}>•</Text>
-                <RichText text={item} style={styles.bulletText} boldFont={boldFont} />
+                <RichText
+                  text={item}
+                  style={styles.bulletText}
+                  boldFont={boldFont}
+                />
               </View>
             ))}
           </View>
@@ -202,34 +335,57 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.name}>{resume.name}</Text>
+          <Text style={[styles.name, es("name")]}>{resume.name}</Text>
           <View style={styles.contactRow}>
             {resume.email && (
-              <Text style={styles.contactItem}>{resume.email}</Text>
+              <Text style={[styles.contactItem, es("contact")]}>{resume.email}</Text>
             )}
             {resume.phone && (
-              <Text style={styles.contactItem}>{resume.phone}</Text>
+              <Text style={[styles.contactItem, es("contact")]}>{resume.phone}</Text>
             )}
             {resume.location && (
-              <Text style={styles.contactItem}>{resume.location}</Text>
+              <Text style={[styles.contactItem, es("contact")]}>{resume.location}</Text>
             )}
             {resume.linkedin && (
-              <Link src={resume.linkedin.startsWith("http") ? resume.linkedin : `https://${resume.linkedin}`} style={styles.contactItem}>
+              <Link
+                src={
+                  resume.linkedin.startsWith("http")
+                    ? resume.linkedin
+                    : `https://${resume.linkedin}`
+                }
+                style={styles.contactItem}
+              >
                 {resume.linkedin}
               </Link>
             )}
             {resume.github && (
-              <Link src={resume.github.startsWith("http") ? resume.github : `https://${resume.github}`} style={styles.contactItem}>
+              <Link
+                src={
+                  resume.github.startsWith("http")
+                    ? resume.github
+                    : `https://${resume.github}`
+                }
+                style={styles.contactItem}
+              >
                 {resume.github}
               </Link>
             )}
             {resume.website && (
-              <Link src={resume.website.startsWith("http") ? resume.website : `https://${resume.website}`} style={styles.contactItem}>
+              <Link
+                src={
+                  resume.website.startsWith("http")
+                    ? resume.website
+                    : `https://${resume.website}`
+                }
+                style={styles.contactItem}
+              >
                 {resume.website}
               </Link>
             )}
             {(resume.extraContact ?? []).map((c, i) => (
-              <Text key={i} style={styles.contactItem}>{c}</Text>
+              <Text key={i} style={styles.contactItem}>
+                {c}
+              </Text>
             ))}
           </View>
         </View>
@@ -241,7 +397,13 @@ function ResumePDFDoc({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume;
   );
 }
 
-export default function PDFExportButton({ resume, settings = DEFAULT_SETTINGS }: { resume: Resume; settings?: ResumeSettings }) {
+export default function PDFExportButton({
+  resume,
+  settings = DEFAULT_SETTINGS,
+}: {
+  resume: Resume;
+  settings?: ResumeSettings;
+}) {
   const defaultName = `${resume.name.replace(/\s+/g, "_")}_Resume`;
   const [basename, setBasename] = useState(defaultName);
   const [editing, setEditing] = useState(false);

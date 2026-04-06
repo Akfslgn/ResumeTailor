@@ -45,7 +45,13 @@ export function lineHeightPDF(f: ResumeSettings["lineHeight"]): number {
 }
 
 export function nameSizePx(s: ResumeSettings["nameSize"]): string {
-  return s === "sm" ? "1.25rem" : s === "xl" ? "2.25rem" : s === "lg" ? "1.875rem" : "1.5rem";
+  return s === "sm"
+    ? "1.25rem"
+    : s === "xl"
+      ? "2.25rem"
+      : s === "lg"
+        ? "1.875rem"
+        : "1.5rem";
 }
 
 export function nameSizePt(s: ResumeSettings["nameSize"]): number {
@@ -53,8 +59,32 @@ export function nameSizePt(s: ResumeSettings["nameSize"]): number {
 }
 
 export const ACCENT = {
-  black:  { headerBorder: "#111111", sectionBorder: "#cccccc", sectionText: "#222222", pdfBorder: "#111111", pdfTitle: "#333333" },
-  navy:   { headerBorder: "#1e3a5f", sectionBorder: "#93c5fd", sectionText: "#1e3a8a", pdfBorder: "#1e3a5f", pdfTitle: "#1e40af" },
-  slate:  { headerBorder: "#475569", sectionBorder: "#cbd5e1", sectionText: "#334155", pdfBorder: "#475569", pdfTitle: "#334155" },
-  forest: { headerBorder: "#14532d", sectionBorder: "#86efac", sectionText: "#166534", pdfBorder: "#14532d", pdfTitle: "#166534" },
+  black: {
+    headerBorder: "#111111",
+    sectionBorder: "#cccccc",
+    sectionText: "#222222",
+    pdfBorder: "#111111",
+    pdfTitle: "#333333",
+  },
+  navy: {
+    headerBorder: "#1e3a5f",
+    sectionBorder: "#93c5fd",
+    sectionText: "#1e3a8a",
+    pdfBorder: "#1e3a5f",
+    pdfTitle: "#1e40af",
+  },
+  slate: {
+    headerBorder: "#475569",
+    sectionBorder: "#cbd5e1",
+    sectionText: "#334155",
+    pdfBorder: "#475569",
+    pdfTitle: "#334155",
+  },
+  forest: {
+    headerBorder: "#14532d",
+    sectionBorder: "#86efac",
+    sectionText: "#166534",
+    pdfBorder: "#14532d",
+    pdfTitle: "#166534",
+  },
 } as const;
