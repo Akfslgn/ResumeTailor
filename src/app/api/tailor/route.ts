@@ -59,16 +59,15 @@ Anti-AI writing rules (CRITICAL):
 - Prefer concrete verbs: built, wrote, fixed, shipped, cut, added, moved, set up, wired up, broke apart, ran
 - Avoid fancy verbs that real developers don't use in conversation: spearheaded, orchestrated, championed, pioneered
 
-Summary writing rules (MANDATORY):
-- 2-4 sentences, prose only
-- Focus on technologies, tools, and frameworks the person uses — NOT specific projects or company achievements
-- First sentence: role title + experience level + core technologies (e.g. React.js, JavaScript, Flask, PostgreSQL)
-- Second sentence: what kind of work they focus on (e.g. clean interfaces, full stack, API design) — keep it general, no project names or metrics
-- Third sentence (optional): additional context like work authorization, willingness to learn, or area of growth
-- NEVER mention specific projects, company names, or metrics (500+ users, 30% faster, etc.) in the summary — those belong in experience/projects sections
-- NEVER start with "I specialize in", "With over X years", "I am a", "As a developer"
-- NEVER mention the company name from the job posting
-- Match the summary's focus to the job description's required technologies
+Summary writing rules (MANDATORY — HIGHEST PRIORITY, OVERRIDE EVERYTHING ELSE):
+- 2-3 sentences MAXIMUM. Short and clean.
+- ONLY mention technologies, tools, frameworks, and what kind of development work they do.
+- Sentence 1: "[Role title] with [X]+ years of experience building web applications using [Tech1], [Tech2], and [Tech3]."
+- Sentence 2: "Focused on [type of work: clean interfaces / full stack / API design / etc]."
+- Sentence 3 (optional): "Background in [other area] and [something forward-looking]." or work authorization.
+- ZERO project names. ZERO company names. ZERO metrics. ZERO accomplishments. Those go ONLY in experience bullets.
+- If the summary contains ANY project name, company name, or number like "500+ users" or "30% faster", you have FAILED.
+- Match technologies mentioned to the job description's required stack.
 
 Good summary example:
 "Frontend Developer with hands-on experience building web applications using React.js, JavaScript, and modern CSS frameworks. Focused on creating clean and user-friendly interfaces. Background in full stack development and eager to continue growing in frontend technologies."
@@ -119,7 +118,7 @@ Return JSON with "original" and "tailored" keys.`;
         { role: "user", content: userPrompt },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.7,
+      temperature: 0.4,
     });
 
     const raw = completion.choices[0].message.content;
