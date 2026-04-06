@@ -197,9 +197,9 @@ export default function Home() {
       </header>
 
       {/* Main */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-auto lg:overflow-hidden">
         {/* Left — Inputs */}
-        <div className="w-[420px] flex-shrink-0 flex flex-col border-r border-slate-700 bg-slate-900/60 overflow-y-auto">
+        <div className="w-full lg:w-[420px] flex-shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-700 bg-slate-900/60 overflow-y-auto">
           <div className="flex flex-col gap-0 p-5">
             {/* Resume Input */}
             <div className="flex flex-col">
@@ -405,9 +405,9 @@ export default function Home() {
         </div>
 
         {/* Right — Preview */}
-        <div className="flex-1 flex flex-col bg-slate-100 overflow-hidden">
+        <div className="flex-1 flex flex-col bg-slate-100 min-h-[80vh] lg:min-h-0 lg:overflow-hidden">
           {/* Toolbar */}
-          <div className="flex-shrink-0 bg-slate-200 border-b border-slate-300 px-5 py-2.5 flex items-center justify-between gap-4">
+          <div className="flex-shrink-0 bg-slate-200 border-b border-slate-300 px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 sm:gap-4">
             <div className="flex gap-1 bg-slate-300 rounded-lg p-1">
               <TabBtn
                 label="Original"
@@ -434,7 +434,7 @@ export default function Home() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-auto p-6">
+          <div className="flex-1 overflow-auto p-4 sm:p-6">
             {!hasResult ? (
               <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-5">
                 <div className="w-16 h-16 rounded-2xl bg-slate-300 flex items-center justify-center">

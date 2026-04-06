@@ -52,7 +52,7 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
     <AccentCtx.Provider value={accent}>
       <div
         id="resume-preview"
-        className="bg-white text-gray-900 p-8 max-w-[800px] mx-auto shadow-lg"
+        className="bg-white text-gray-900 p-4 sm:p-8 max-w-[800px] mx-auto shadow-lg"
         style={{
           fontFamily: fontFamilyCSS(settings.fontStyle),
           fontSize: fontSizePx(settings.fontSize),
