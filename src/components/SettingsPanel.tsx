@@ -102,6 +102,63 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
             </div>
           </SettingSection>
 
+          {/* Header Alignment */}
+          <SettingSection label="Header Alignment">
+            <ToggleGroup
+              options={[
+                { value: "center", label: "Center" },
+                { value: "left",   label: "Left"   },
+              ]}
+              value={settings.headerAlign ?? "center"}
+              onChange={(v) => set("headerAlign", v as ResumeSettings["headerAlign"])}
+            />
+          </SettingSection>
+
+          {/* Name Size */}
+          <SettingSection label="Name Size">
+            <ToggleGroup
+              options={[
+                { value: "sm", label: "S" },
+                { value: "md", label: "M" },
+                { value: "lg", label: "L" },
+                { value: "xl", label: "XL" },
+              ]}
+              value={settings.nameSize ?? "lg"}
+              onChange={(v) => set("nameSize", v as ResumeSettings["nameSize"])}
+            />
+          </SettingSection>
+
+          {/* Name Style */}
+          <SettingSection label="Name Style">
+            <div className="flex gap-2">
+              <ToggleGroup
+                options={[
+                  { value: "uppercase", label: "UPPERCASE" },
+                  { value: "normal",    label: "Normal" },
+                ]}
+                value={settings.nameCase ?? "uppercase"}
+                onChange={(v) => set("nameCase", v as ResumeSettings["nameCase"])}
+              />
+            </div>
+            <label className="flex items-center gap-2 mt-2 text-xs text-gray-600 cursor-pointer">
+              <input type="checkbox" checked={settings.nameBold ?? true} onChange={(e) => set("nameBold", e.target.checked)}
+                className="rounded border-gray-300" />
+              Bold name
+            </label>
+          </SettingSection>
+
+          {/* Section Headers */}
+          <SettingSection label="Section Headers">
+            <ToggleGroup
+              options={[
+                { value: "uppercase", label: "UPPERCASE" },
+                { value: "normal",    label: "Normal" },
+              ]}
+              value={settings.sectionHeaderCase ?? "uppercase"}
+              onChange={(v) => set("sectionHeaderCase", v as ResumeSettings["sectionHeaderCase"])}
+            />
+          </SettingSection>
+
           {/* Preview hint */}
           <div className="text-xs text-gray-400 bg-gray-50 rounded-lg p-3 leading-relaxed">
             Changes apply to both the preview and the downloaded PDF.

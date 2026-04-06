@@ -4,7 +4,7 @@ import { Link2, Pencil, Check, X, Plus, Trash2, GripVertical } from "lucide-reac
 import { Resume } from "@/types/resume";
 import {
   ResumeSettings, DEFAULT_SETTINGS,
-  fontFamilyCSS, fontSizePx, lineHeightVal, ACCENT,
+  fontFamilyCSS, fontSizePx, lineHeightVal, nameSizePx, ACCENT,
 } from "@/types/settings";
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors,
@@ -23,7 +23,8 @@ interface Props {
 }
 
 type AccentColors = { headerBorder: string; sectionBorder: string; sectionText: string; pdfBorder: string; pdfTitle: string };
-const AccentCtx = createContext<AccentColors>(ACCENT.black);
+type StyleCtxType = AccentColors & { sectionHeaderCase: "normal" | "uppercase" };
+const StyleCtx = createContext<StyleCtxType>({ ...ACCENT.black, sectionHeaderCase: "uppercase" });
 
 // Parse **bold** markers into React nodes
 function parseMarkup(text: string | undefined | null): React.ReactNode {
@@ -267,7 +268,7 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
   }
 
   return (
-    <AccentCtx.Provider value={accent}>
+    <StyleCtx.Provider value={{ ...accent, sectionHeaderCase: settings.sectionHeaderCase }}>
       <div
         id="resume-preview"
         className="bg-white text-gray-900 p-4 sm:p-8 max-w-[800px] mx-auto shadow-lg"
@@ -278,9 +279,9 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
         }}
       >
         {/* Header */}
-        <div className="text-center pb-4 mb-4 border-b-2" style={{ borderColor: accent.headerBorder }}>
-          <h1 className="text-3xl font-bold tracking-wide uppercase text-gray-900">
-            <E value={resume.name} bold onSave={onUpdate ? (v) => upd({ name: v }) : undefined} />
+        <div className={`pb-4 mb-4 border-b-2 ${settings.headerAlign === "center" ? "text-center" : "text-left"}`} style={{ borderColor: accent.headerBorder }}>
+          <h1 className="tracking-wide text-gray-900" style={{ fontSize: nameSizePx(settings.nameSize), textTransform: settings.nameCase === "uppercase" ? "uppercase" : "none", fontWeight: settings.nameBold ? 700 : 400 }}>
+            <E value={resume.name} bold={settings.nameBold} onSave={onUpdate ? (v) => upd({ name: v }) : undefined} />
           </h1>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4 text-xs text-gray-600">
             {resume.email && <E value={resume.email} onSave={onUpdate ? (v) => upd({ email: v }) : undefined} onDelete={onUpdate ? () => upd({ email: "" }) : undefined} />}
@@ -333,7 +334,7 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
           </div>
         )}
       </div>
-    </AccentCtx.Provider>
+    </StyleCtx.Provider>
   );
 }
 
@@ -356,9 +357,11 @@ function EditableSection({ sectionKey, title, children, onTitleChange, onDelete,
   sectionKey: string; title: string; children: React.ReactNode;
   onTitleChange?: (v: string) => void; onDelete?: () => void; editable: boolean;
 }) {
-  const c = useContext(AccentCtx);
+  const c = useContext(StyleCtx);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(title);
+
+  const caseStyle = c.sectionHeaderCase === "uppercase" ? "uppercase" : "normal-case";
 
   return (
     <div className="mb-4">
@@ -367,12 +370,12 @@ function EditableSection({ sectionKey, title, children, onTitleChange, onDelete,
           <span className="inline-flex items-center gap-1">
             <input autoFocus value={draft} onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") { onTitleChange(draft.trim()); setEditing(false); } if (e.key === "Escape") setEditing(false); }}
-              className="text-xs font-bold uppercase tracking-widest border border-blue-400 rounded px-1 py-0 outline-none" style={{ color: c.sectionText }} />
+              className={`text-xs font-bold ${caseStyle} tracking-widest border border-blue-400 rounded px-1 py-0 outline-none`} style={{ color: c.sectionText }} />
             <button onClick={() => { onTitleChange(draft.trim()); setEditing(false); }} className="text-green-600 hover:text-green-700"><Check size={11} /></button>
             <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600"><X size={11} /></button>
           </span>
         ) : (
-          <h2 className={`text-xs font-bold uppercase tracking-widest flex-1 ${editable ? "cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors" : ""}`}
+          <h2 className={`text-xs font-bold ${caseStyle} tracking-widest flex-1 ${editable ? "cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors" : ""}`}
             style={{ color: c.sectionText }}
             onClick={onTitleChange ? () => { setDraft(title); setEditing(true); } : undefined}>
             {title}
@@ -654,11 +657,11 @@ function EduItemView({ ed }: { ed: Resume["education"][0] }) {
 
 /* ── Section with accent colors from context (static, used for non-edit mode) ── */
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  const c = useContext(AccentCtx);
+  const c = useContext(StyleCtx);
   return (
     <div className="mb-4">
       <h2
-        className="text-xs font-bold uppercase tracking-widest border-b pb-0.5 mb-2"
+        className={`text-xs font-bold ${c.sectionHeaderCase === "uppercase" ? "uppercase" : "normal-case"} tracking-widest border-b pb-0.5 mb-2`}
         style={{ color: c.sectionText, borderColor: c.sectionBorder }}
       >
         {title}

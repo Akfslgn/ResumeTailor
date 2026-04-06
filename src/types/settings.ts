@@ -3,6 +3,11 @@ export interface ResumeSettings {
   fontSize: "sm" | "md" | "lg";
   lineHeight: "tight" | "normal" | "relaxed";
   accentColor: "black" | "navy" | "slate" | "forest";
+  nameSize: "sm" | "md" | "lg" | "xl";
+  nameCase: "normal" | "uppercase";
+  nameBold: boolean;
+  sectionHeaderCase: "normal" | "uppercase";
+  headerAlign: "center" | "left";
 }
 
 export const DEFAULT_SETTINGS: ResumeSettings = {
@@ -10,6 +15,11 @@ export const DEFAULT_SETTINGS: ResumeSettings = {
   fontSize: "md",
   lineHeight: "normal",
   accentColor: "black",
+  nameSize: "lg",
+  nameCase: "uppercase",
+  nameBold: true,
+  sectionHeaderCase: "uppercase",
+  headerAlign: "center",
 };
 
 export function fontFamilyCSS(f: ResumeSettings["fontStyle"]): string {
@@ -32,6 +42,14 @@ export function fontSizePt(f: ResumeSettings["fontSize"]): number {
 
 export function lineHeightPDF(f: ResumeSettings["lineHeight"]): number {
   return f === "tight" ? 1.2 : f === "relaxed" ? 1.6 : 1.4;
+}
+
+export function nameSizePx(s: ResumeSettings["nameSize"]): string {
+  return s === "sm" ? "1.25rem" : s === "xl" ? "2.25rem" : s === "lg" ? "1.875rem" : "1.5rem";
+}
+
+export function nameSizePt(s: ResumeSettings["nameSize"]): number {
+  return s === "sm" ? 14 : s === "xl" ? 26 : s === "lg" ? 22 : 18;
 }
 
 export const ACCENT = {
