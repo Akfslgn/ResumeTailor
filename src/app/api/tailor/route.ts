@@ -60,19 +60,24 @@ Anti-AI writing rules (CRITICAL):
 - Avoid fancy verbs that real developers don't use in conversation: spearheaded, orchestrated, championed, pioneered
 
 Summary writing rules (MANDATORY):
-- 2-4 sentences, prose only, no tech lists
-- First sentence: years of experience (SUM ALL jobs including freelance/teaching) + what you build + main stack
-- Second sentence: 1-2 real, specific accomplishments with numbers from the resume  
-- Third sentence (optional): what makes you different or what you're best at — in plain English
+- 2-4 sentences, prose only
+- Focus on technologies, tools, and frameworks the person uses — NOT specific projects or company achievements
+- First sentence: role title + experience level + core technologies (e.g. React.js, JavaScript, Flask, PostgreSQL)
+- Second sentence: what kind of work they focus on (e.g. clean interfaces, full stack, API design) — keep it general, no project names or metrics
+- Third sentence (optional): additional context like work authorization, willingness to learn, or area of growth
+- NEVER mention specific projects, company names, or metrics (500+ users, 30% faster, etc.) in the summary — those belong in experience/projects sections
 - NEVER start with "I specialize in", "With over X years", "I am a", "As a developer"
 - NEVER mention the company name from the job posting
-- Count ALL positions when calculating years of experience — not just the most recent job
+- Match the summary's focus to the job description's required technologies
 
 Good summary example:
-"Full Stack Developer with 8+ years building web apps — React frontends, Node.js/Flask backends, PostgreSQL. At Diamond Ze, shipped a library platform for 500+ users and cut DB query times by 30% through index tuning and query rewrites. Equally comfortable debugging a slow API endpoint or polishing a UI component."
+"Frontend Developer with hands-on experience building web applications using React.js, JavaScript, and modern CSS frameworks. Focused on creating clean and user-friendly interfaces. Background in full stack development and eager to continue growing in frontend technologies."
 
 Bad summary example (NEVER write this):
 "With over 5 years of experience, I specialize in creating interactive UIs using React. My background includes building scalable applications in collaborative Agile environments."
+
+Another bad example (NEVER write this — too project-specific for a summary):
+"Full Stack Developer who shipped a library platform for 500+ users and cut DB query times by 30%."
 
 Bullet point rules:
 - Strong past-tense action verb to start every bullet — but vary them (don't use "Built" 4 times)
