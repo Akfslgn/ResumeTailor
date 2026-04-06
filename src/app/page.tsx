@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import ResumePreview from "@/components/ResumePreview";
 import ResumeChatPanel from "@/components/ResumeChatPanel";
-import SettingsPanel from "@/components/SettingsPanel";
 import { Resume } from "@/types/resume";
 import { ResumeSettings, DEFAULT_SETTINGS } from "@/types/settings";
 import { EXAMPLE_RESUME, EXAMPLE_JOB_DESCRIPTION } from "@/data/exampleData";
@@ -73,8 +72,8 @@ export default function Home() {
   );
   const [parsing, setParsing] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [mobileView, setMobileView] = useState<"input" | "preview">("input");
+  const [showSettings, setShowSettings] = useState(false);
 
   /* ── Undo history ── */
   const undoStack = useRef<{ tab: Tab; resume: Resume }[]>([]);
@@ -589,13 +588,133 @@ export default function Home() {
                 <Undo2 size={13} />
                 <span className="hidden sm:inline">Undo</span>
               </button>
-              <button
-                onClick={() => setShowSettings(true)}
-                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 text-xs bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg transition-colors font-medium"
-              >
-                <Settings size={13} />
-                <span className="hidden sm:inline">Appearance</span>
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 text-xs rounded-lg transition-colors font-medium ${showSettings ? "bg-slate-500 text-white" : "bg-slate-300 hover:bg-slate-400 text-slate-700"}`}
+                >
+                  <Settings size={13} />
+                  <span className="hidden sm:inline">Appearance</span>
+                </button>
+                {showSettings && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setShowSettings(false)} />
+                    <div className="absolute right-0 top-full mt-1.5 z-40 bg-white rounded-xl shadow-xl border border-gray-200 w-[300px] sm:w-[340px] max-h-[70vh] overflow-y-auto p-4 space-y-4">
+                      {/* Font Family */}
+                      <SettingRow label="Font">
+                        <ToggleGroup
+                          options={[
+                            { value: "serif", label: "Serif", style: { fontFamily: "Georgia, serif" } },
+                            { value: "sans", label: "Sans", style: { fontFamily: "Arial, sans-serif" } },
+                            { value: "mono", label: "Mono", style: { fontFamily: "'Courier New', monospace" } },
+                          ]}
+                          value={settings.fontStyle}
+                          onChange={(v) => setSettings({ ...settings, fontStyle: v as ResumeSettings["fontStyle"] })}
+                        />
+                      </SettingRow>
+                      {/* Font Size */}
+                      <SettingRow label="Size">
+                        <ToggleGroup
+                          options={[
+                            { value: "sm", label: "S" },
+                            { value: "md", label: "M" },
+                            { value: "lg", label: "L" },
+                          ]}
+                          value={settings.fontSize}
+                          onChange={(v) => setSettings({ ...settings, fontSize: v as ResumeSettings["fontSize"] })}
+                        />
+                      </SettingRow>
+                      {/* Line Spacing */}
+                      <SettingRow label="Spacing">
+                        <ToggleGroup
+                          options={[
+                            { value: "tight", label: "Tight" },
+                            { value: "normal", label: "Normal" },
+                            { value: "relaxed", label: "Wide" },
+                          ]}
+                          value={settings.lineHeight}
+                          onChange={(v) => setSettings({ ...settings, lineHeight: v as ResumeSettings["lineHeight"] })}
+                        />
+                      </SettingRow>
+                      {/* Accent Color */}
+                      <SettingRow label="Color">
+                        <div className="flex gap-2">
+                          {([
+                            { value: "black", color: "#111111" },
+                            { value: "navy", color: "#1e3a8a" },
+                            { value: "slate", color: "#475569" },
+                            { value: "forest", color: "#166534" },
+                          ] as const).map(({ value, color }) => (
+                            <button
+                              key={value}
+                              onClick={() => setSettings({ ...settings, accentColor: value })}
+                              className={`w-7 h-7 rounded-full border-2 transition-colors ${settings.accentColor === value ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200 hover:border-gray-400"}`}
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </div>
+                      </SettingRow>
+                      {/* Header Alignment */}
+                      <SettingRow label="Header">
+                        <ToggleGroup
+                          options={[
+                            { value: "center", label: "Center" },
+                            { value: "left", label: "Left" },
+                          ]}
+                          value={settings.headerAlign ?? "center"}
+                          onChange={(v) => setSettings({ ...settings, headerAlign: v as ResumeSettings["headerAlign"] })}
+                        />
+                      </SettingRow>
+                      {/* Name Size */}
+                      <SettingRow label="Name Size">
+                        <ToggleGroup
+                          options={[
+                            { value: "sm", label: "S" },
+                            { value: "md", label: "M" },
+                            { value: "lg", label: "L" },
+                            { value: "xl", label: "XL" },
+                          ]}
+                          value={settings.nameSize ?? "lg"}
+                          onChange={(v) => setSettings({ ...settings, nameSize: v as ResumeSettings["nameSize"] })}
+                        />
+                      </SettingRow>
+                      {/* Name Style */}
+                      <SettingRow label="Name">
+                        <div className="flex items-center gap-2">
+                          <ToggleGroup
+                            options={[
+                              { value: "uppercase", label: "ABC" },
+                              { value: "normal", label: "Abc" },
+                            ]}
+                            value={settings.nameCase ?? "uppercase"}
+                            onChange={(v) => setSettings({ ...settings, nameCase: v as ResumeSettings["nameCase"] })}
+                          />
+                          <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer whitespace-nowrap">
+                            <input
+                              type="checkbox"
+                              checked={settings.nameBold ?? true}
+                              onChange={(e) => setSettings({ ...settings, nameBold: e.target.checked })}
+                              className="rounded border-gray-300"
+                            />
+                            Bold
+                          </label>
+                        </div>
+                      </SettingRow>
+                      {/* Section Headers */}
+                      <SettingRow label="Sections">
+                        <ToggleGroup
+                          options={[
+                            { value: "uppercase", label: "UPPER" },
+                            { value: "normal", label: "Normal" },
+                          ]}
+                          value={settings.sectionHeaderCase ?? "uppercase"}
+                          onChange={(v) => setSettings({ ...settings, sectionHeaderCase: v as ResumeSettings["sectionHeaderCase"] })}
+                        />
+                      </SettingRow>
+                    </div>
+                  </>
+                )}
+              </div>
               {displayedResume && (
                 <PDFExport resume={displayedResume} settings={settings} />
               )}
@@ -658,13 +777,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {showSettings && (
-        <SettingsPanel
-          settings={settings}
-          onChange={setSettings}
-          onClose={() => setShowSettings(false)}
-        />
-      )}
     </div>
   );
 }
@@ -704,6 +816,52 @@ function Step({ n, text }: { n: number; text: string }) {
         {n}
       </span>
       <span>{text}</span>
+    </div>
+  );
+}
+
+function SettingRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-xs font-medium text-gray-500 w-16 flex-shrink-0">
+        {label}
+      </span>
+      <div className="flex-1">{children}</div>
+    </div>
+  );
+}
+
+function ToggleGroup({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: string; label: string; style?: React.CSSProperties }[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex gap-0.5 bg-gray-100 rounded-lg p-0.5">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          onClick={() => onChange(o.value)}
+          style={o.style}
+          className={`flex-1 py-1.5 text-xs rounded-md transition-colors ${
+            value === o.value
+              ? "bg-white text-gray-800 shadow-sm font-medium"
+              : "text-gray-400 hover:text-gray-600"
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
     </div>
   );
 }
