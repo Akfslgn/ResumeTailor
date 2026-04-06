@@ -82,7 +82,7 @@ function FormatBar({
   onChange: (s: ElementStyle) => void;
 }) {
   return (
-    <div className="flex items-center gap-1 mb-1 flex-wrap" onClick={(e) => e.stopPropagation()}>
+    <div className="flex items-center gap-1 mb-1 flex-wrap max-w-full overflow-x-auto" onClick={(e) => e.stopPropagation()}>
       <select
         value={style.fontFamily ?? ""}
         onChange={(e) =>
@@ -894,7 +894,7 @@ function SortableSectionWrapper({
       <div
         {...attributes}
         {...listeners}
-        className="absolute -left-6 top-0 opacity-0 group-hover/section:opacity-100 cursor-grab text-gray-300 hover:text-gray-500 transition-opacity"
+        className="absolute -left-4 sm:-left-6 top-0 opacity-0 group-hover/section:opacity-100 cursor-grab text-gray-300 hover:text-gray-500 transition-opacity"
         title="Drag to reorder"
       >
         <GripVertical size={14} />

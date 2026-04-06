@@ -13,6 +13,8 @@ import {
   FileCheck,
   Settings,
   PenLine,
+  PanelLeft,
+  Eye,
 } from "lucide-react";
 import ResumePreview from "@/components/ResumePreview";
 import ResumeChatPanel from "@/components/ResumeChatPanel";
@@ -71,6 +73,7 @@ export default function Home() {
   const [parsing, setParsing] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [mobileView, setMobileView] = useState<"input" | "preview">("input");
   const [settings, setSettings] = useState<ResumeSettings>(() => {
     if (typeof window === "undefined") return DEFAULT_SETTINGS;
     try {
@@ -258,10 +261,10 @@ export default function Home() {
       <Toaster position="top-right" />
 
       {/* Header */}
-      <header className="flex-shrink-0 border-b border-slate-700 px-6 py-4 flex items-center gap-3">
-        <FileText className="text-blue-400" size={22} />
-        <span className="text-lg font-bold tracking-tight">ResumeTailor</span>
-        <span className="ml-2 text-xs bg-blue-600/30 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full">
+      <header className="flex-shrink-0 border-b border-slate-700 px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-2 sm:gap-3">
+        <FileText className="text-blue-400" size={20} />
+        <span className="text-base sm:text-lg font-bold tracking-tight">ResumeTailor</span>
+        <span className="hidden sm:inline ml-2 text-xs bg-blue-600/30 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full">
           GPT-4o
         </span>
         {hasResult && (
@@ -270,16 +273,44 @@ export default function Home() {
             className="ml-auto flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
           >
             <RotateCcw size={12} />
-            Start Over
+            <span className="hidden sm:inline">Start Over</span>
           </button>
         )}
       </header>
 
+      {/* Mobile view toggle */}
+      {hasResult && (
+        <div className="lg:hidden flex-shrink-0 bg-slate-800 border-b border-slate-700 px-4 py-2 flex gap-2">
+          <button
+            onClick={() => setMobileView("input")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-colors ${
+              mobileView === "input"
+                ? "bg-blue-600 text-white"
+                : "bg-slate-700 text-slate-400"
+            }`}
+          >
+            <PanelLeft size={13} />
+            Input
+          </button>
+          <button
+            onClick={() => setMobileView("preview")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-colors ${
+              mobileView === "preview"
+                ? "bg-blue-600 text-white"
+                : "bg-slate-700 text-slate-400"
+            }`}
+          >
+            <Eye size={13} />
+            Preview
+          </button>
+        </div>
+      )}
+
       {/* Main */}
       <div className="flex flex-col lg:flex-row flex-1 overflow-auto lg:overflow-hidden">
         {/* Left — Inputs */}
-        <div className="w-full lg:w-[420px] flex-shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-700 bg-slate-900/60 overflow-y-auto">
-          <div className="flex flex-col gap-0 p-5">
+        <div className={`w-full lg:w-[420px] flex-shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-700 bg-slate-900/60 overflow-y-auto ${hasResult && mobileView === "preview" ? "hidden lg:flex" : ""}`}>
+          <div className="flex flex-col gap-0 p-4 sm:p-5">
             {/* Resume Input */}
             <div className="flex flex-col">
               <div className="flex items-center justify-between mb-1.5">
@@ -484,10 +515,10 @@ export default function Home() {
         </div>
 
         {/* Right — Preview */}
-        <div className="flex-1 flex flex-col bg-slate-100 min-h-[80vh] lg:min-h-0 lg:overflow-hidden">
+        <div className={`flex-1 flex flex-col bg-slate-100 min-h-0 lg:overflow-hidden ${hasResult && mobileView === "input" ? "hidden lg:flex" : ""}`}>
           {/* Toolbar */}
-          <div className="flex-shrink-0 bg-slate-200 border-b border-slate-300 px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 sm:gap-4">
-            <div className="flex gap-1 bg-slate-300 rounded-lg p-1">
+          <div className="flex-shrink-0 bg-slate-200 border-b border-slate-300 px-2 sm:px-5 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-1.5 sm:gap-4">
+            <div className="flex gap-1 bg-slate-300 rounded-lg p-0.5 sm:p-1">
               <TabBtn
                 label="Original"
                 active={activeTab === "original"}
@@ -501,12 +532,13 @@ export default function Home() {
                 onClick={() => tailoredResume && setActiveTab("tailored")}
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={() => setShowSettings(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg transition-colors font-medium"
+                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 text-xs bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg transition-colors font-medium"
               >
-                <Settings size={13} /> Appearance
+                <Settings size={13} />
+                <span className="hidden sm:inline">Appearance</span>
               </button>
               {displayedResume && (
                 <PDFExport resume={displayedResume} settings={settings} />
@@ -593,7 +625,7 @@ function TabBtn({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+      className={`px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all ${
         active
           ? "bg-white text-slate-900 shadow-sm"
           : disabled

@@ -422,9 +422,9 @@ export default function PDFExportButton({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 sm:gap-2">
       {/* Filename editor */}
-      <div className="flex items-center gap-1 bg-slate-300 border border-slate-400 rounded-lg px-2 py-1.5 text-slate-700">
+      <div className="hidden sm:flex items-center gap-1 bg-slate-300 border border-slate-400 rounded-lg px-2 py-1.5 text-slate-700">
         {editing ? (
           <>
             <input
@@ -467,11 +467,12 @@ export default function PDFExportButton({
       >
         {({ loading }) => (
           <button
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-60"
+            className="flex items-center gap-1.5 sm:gap-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors disabled:opacity-60"
             disabled={loading}
           >
-            <Download size={15} />
-            {loading ? "Preparing..." : "Download PDF"}
+            <Download size={14} />
+            <span className="hidden sm:inline">{loading ? "Preparing..." : "Download PDF"}</span>
+            <span className="sm:hidden">{loading ? "..." : "PDF"}</span>
           </button>
         )}
       </PDFDownloadLink>
