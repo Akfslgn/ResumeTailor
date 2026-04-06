@@ -12,10 +12,24 @@ export const masterResume: Resume = {
     "Full-stack developer with 5+ years of experience building scalable web applications. Passionate about clean code, performance optimization, and great user experiences. Experienced in React, Node.js, TypeScript, and cloud platforms.",
   skills: {
     languages: ["TypeScript", "JavaScript", "Python", "SQL", "HTML", "CSS"],
-    frameworks: ["React", "Next.js", "Node.js", "Express", "NestJS", "FastAPI", "Tailwind CSS"],
+    frameworks: [
+      "React",
+      "Next.js",
+      "Node.js",
+      "Express",
+      "NestJS",
+      "FastAPI",
+      "Tailwind CSS",
+    ],
     tools: ["Git", "Docker", "Webpack", "Vite", "Jest", "Cypress", "Figma"],
     databases: ["PostgreSQL", "MongoDB", "Redis", "Supabase", "Firebase"],
-    cloud: ["AWS (EC2, S3, Lambda, RDS)", "Vercel", "Netlify", "GitHub Actions", "CI/CD"],
+    cloud: [
+      "AWS (EC2, S3, Lambda, RDS)",
+      "Vercel",
+      "Netlify",
+      "GitHub Actions",
+      "CI/CD",
+    ],
   },
   experience: [
     {
@@ -73,7 +87,13 @@ export const masterResume: Resume = {
       name: "OpenTask",
       description:
         "Open-source project management tool with real-time collaboration, drag-and-drop boards, and team analytics",
-      technologies: ["Next.js", "TypeScript", "Prisma", "PostgreSQL", "Socket.io"],
+      technologies: [
+        "Next.js",
+        "TypeScript",
+        "Prisma",
+        "PostgreSQL",
+        "Socket.io",
+      ],
       url: "github.com/akifsalgin/opentask",
     },
     {

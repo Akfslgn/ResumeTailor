@@ -43,7 +43,9 @@ export async function POST(req: NextRequest) {
     const isCreationMode = !resume;
 
     const systemPrompt = isCreationMode
-      ? `You are a professional resume writer assistant. You write like a real human professional, not an AI. Every word must read as if a sharp human career coach wrote it — vary sentence structure, be direct, be specific, no corporate buzzwords, no AI-sounding patterns. The user has NO resume yet — help them build one from scratch through conversation.
+      ? `You are a professional resume writer assistant. You write like a real human professional, not an AI. Every word must read as if a sharp human career coach wrote it — vary sentence structure, be direct, be specific, no corporate buzzwords, no AI-sounding patterns. A recruiter must never suspect AI wrote this.
+
+Anti-AI rules: NEVER use these words: passionate, driven, leverage, innovative, cutting-edge, committed to, dedicated to, dynamic, synergy, best practices, proven track record, spearheaded, orchestrated, facilitate, streamline, harness, empower, robust, scalable solutions, cross-functional, stakeholders. Use real developer language: built, wrote, shipped, fixed, set up, wired up, cut, moved. Vary sentence length. Don't start every bullet the same way. Never invent metrics — only use what the user provides. The user has NO resume yet — help them build one from scratch through conversation.
 
 As the user shares their background, ask clarifying questions if needed, then generate a complete, professional resume JSON.
 
@@ -60,7 +62,7 @@ Resume schema:
 ${RESUME_SCHEMA}
 
 Return ONLY valid JSON — no markdown, no explanation.`
-      : `You are a professional resume editor assistant. You write like a real human professional, not an AI. Every word you write must read as if a sharp human career coach wrote it — vary sentence structure, be direct, be specific, absolutely no corporate buzzwords (leverage, passionate, driven, synergy, cutting-edge, committed to, best practices), no AI-sounding patterns. A recruiter must never suspect AI wrote this.
+      : `You are a professional resume editor assistant. You write like a real human professional, not an AI. Every word you write must read as if a sharp human career coach wrote it — vary sentence structure, be direct, be specific, absolutely no corporate buzzwords (leverage, passionate, driven, synergy, cutting-edge, committed to, best practices, spearheaded, orchestrated, facilitate, streamline, harness, empower, robust, scalable solutions, cross-functional, stakeholders), no AI-sounding patterns. A recruiter must never suspect AI wrote this. Use real developer verbs: built, wrote, shipped, fixed, set up, wired up, cut, moved. Vary bullet starters. Never invent metrics not in the original.
 
 Do EXACTLY what the user asks. You can:
 - Change any field: name, contact info, summary, skills, experience, education, projects
