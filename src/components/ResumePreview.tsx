@@ -8,6 +8,7 @@ import {
   Plus,
   Trash2,
   GripVertical,
+  Eraser,
 } from "lucide-react";
 import { Resume, ElementStyle } from "@/types/resume";
 import {
@@ -1820,6 +1821,13 @@ function E({
             }}
           />
           <button
+            onClick={() => setDraft("")}
+            className="text-orange-400 hover:text-orange-600 flex-shrink-0 p-1 rounded-md hover:bg-orange-50 active:bg-orange-100"
+            title="Clear"
+          >
+            <Eraser size={16} />
+          </button>
+          <button
             onClick={() => {
               onSave(draft.trim());
               setEditing(false);
@@ -1924,6 +1932,12 @@ function EBlock({
           style={inlineStyle}
         />
         <div className="flex gap-2">
+          <button
+            onClick={() => setDraft("")}
+            className="text-sm text-orange-400 hover:text-orange-600 flex items-center gap-1 px-2 py-1 rounded-md hover:bg-orange-50 active:bg-orange-100"
+          >
+            <Eraser size={16} /> Clear
+          </button>
           <button
             onClick={() => {
               onSave(draft.trim());
