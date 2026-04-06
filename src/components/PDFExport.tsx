@@ -145,19 +145,31 @@ function RichText({
 
 // Convert ElementStyle to react-pdf compatible style object
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function pdfElemStyle(s: ElementStyle | undefined, boldFont: string, baseFont: string): any {
+function pdfElemStyle(
+  s: ElementStyle | undefined,
+  boldFont: string,
+  baseFont: string,
+): any {
   if (!s) return {};
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const out: any = {};
   if (s.fontSize) out.fontSize = s.fontSize * 0.75; // px to pt approx
   if (s.fontFamily) {
     // Map CSS font-family to PDF font
-    if (s.fontFamily.includes("Arial") || s.fontFamily.includes("Helvetica") || s.fontFamily.includes("Verdana") || s.fontFamily.includes("Trebuchet")) out.fontFamily = "Helvetica";
+    if (
+      s.fontFamily.includes("Arial") ||
+      s.fontFamily.includes("Helvetica") ||
+      s.fontFamily.includes("Verdana") ||
+      s.fontFamily.includes("Trebuchet")
+    )
+      out.fontFamily = "Helvetica";
     else if (s.fontFamily.includes("Courier")) out.fontFamily = "Courier";
-    else if (s.fontFamily.includes("Georgia") || s.fontFamily.includes("Times")) out.fontFamily = "Times-Roman";
+    else if (s.fontFamily.includes("Georgia") || s.fontFamily.includes("Times"))
+      out.fontFamily = "Times-Roman";
   }
   if (s.fontWeight === "bold") out.fontFamily = boldFont;
-  if (s.fontStyle === "italic") out.fontFamily = (out.fontFamily || baseFont) + "-Oblique";
+  if (s.fontStyle === "italic")
+    out.fontFamily = (out.fontFamily || baseFont) + "-Oblique";
   if (s.textDecoration === "underline") out.textDecoration = "underline";
   if (s.textTransform === "uppercase") out.textTransform = "uppercase";
   if (s.color) out.color = s.color;
@@ -172,9 +184,16 @@ function ResumePDFDoc({
   settings?: ResumeSettings;
 }) {
   const { styles, boldFont } = makeStyles(settings);
-  const baseFont = settings.fontStyle === "serif" ? "Times-Roman" : settings.fontStyle === "mono" ? "Courier" : "Helvetica";
+  const baseFont =
+    settings.fontStyle === "serif"
+      ? "Times-Roman"
+      : settings.fontStyle === "mono"
+        ? "Courier"
+        : "Helvetica";
   const so = resume.styleOverrides ?? {};
-  function es(key: string) { return pdfElemStyle(so[key], boldFont, baseFont); }
+  function es(key: string) {
+    return pdfElemStyle(so[key], boldFont, baseFont);
+  }
 
   const DEFAULT_ORDER = [
     "summary",
@@ -231,8 +250,13 @@ function ResumePDFDoc({
               <View key={i} style={styles.mb3}>
                 <View style={styles.expHeader}>
                   <View style={{ flexDirection: "row" }}>
-                    <Text style={[styles.expTitle, es("jobTitle")]}>{exp.title}</Text>
-                    <Text style={[styles.expCompany, es("company")]}> — {exp.company}</Text>
+                    <Text style={[styles.expTitle, es("jobTitle")]}>
+                      {exp.title}
+                    </Text>
+                    <Text style={[styles.expCompany, es("company")]}>
+                      {" "}
+                      — {exp.company}
+                    </Text>
                   </View>
                   <Text style={[styles.expDate, es("date")]}>
                     {exp.startDate} – {exp.endDate}
@@ -338,13 +362,19 @@ function ResumePDFDoc({
           <Text style={[styles.name, es("name")]}>{resume.name}</Text>
           <View style={styles.contactRow}>
             {resume.email && (
-              <Text style={[styles.contactItem, es("contact")]}>{resume.email}</Text>
+              <Text style={[styles.contactItem, es("contact")]}>
+                {resume.email}
+              </Text>
             )}
             {resume.phone && (
-              <Text style={[styles.contactItem, es("contact")]}>{resume.phone}</Text>
+              <Text style={[styles.contactItem, es("contact")]}>
+                {resume.phone}
+              </Text>
             )}
             {resume.location && (
-              <Text style={[styles.contactItem, es("contact")]}>{resume.location}</Text>
+              <Text style={[styles.contactItem, es("contact")]}>
+                {resume.location}
+              </Text>
             )}
             {resume.linkedin && (
               <Link
@@ -471,7 +501,9 @@ export default function PDFExportButton({
             disabled={loading}
           >
             <Download size={14} />
-            <span className="hidden sm:inline">{loading ? "Preparing..." : "Download PDF"}</span>
+            <span className="hidden sm:inline">
+              {loading ? "Preparing..." : "Download PDF"}
+            </span>
             <span className="sm:hidden">{loading ? "..." : "PDF"}</span>
           </button>
         )}

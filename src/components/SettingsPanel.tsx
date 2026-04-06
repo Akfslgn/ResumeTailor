@@ -14,7 +14,10 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/30" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex justify-end bg-black/30"
+      onClick={onClose}
+    >
       <div
         className="w-full sm:w-72 max-w-[calc(100vw-3rem)] h-full bg-white shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}

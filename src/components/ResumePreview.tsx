@@ -82,13 +82,16 @@ function FormatBar({
   onChange: (s: ElementStyle) => void;
 }) {
   return (
-    <div className="flex items-center gap-1 mb-1 flex-wrap max-w-full overflow-x-auto" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="flex items-center gap-1.5 mb-1 flex-wrap max-w-full overflow-x-auto"
+      onClick={(e) => e.stopPropagation()}
+    >
       <select
         value={style.fontFamily ?? ""}
         onChange={(e) =>
           onChange({ ...style, fontFamily: e.target.value || undefined })
         }
-        className="text-[10px] border border-gray-200 rounded px-1 py-0.5 bg-white outline-none cursor-pointer"
+        className="text-xs border border-gray-200 rounded px-1.5 py-1 bg-white outline-none cursor-pointer"
       >
         {FONT_OPTIONS.map((f) => (
           <option key={f.value} value={f.value}>
@@ -106,7 +109,7 @@ function FormatBar({
           })
         }
         placeholder="px"
-        className="text-[10px] border border-gray-200 rounded px-1 py-0.5 w-10 text-center outline-none"
+        className="text-xs border border-gray-200 rounded px-1.5 py-1 w-12 text-center outline-none"
         min={8}
         max={72}
       />
@@ -118,7 +121,7 @@ function FormatBar({
             fontWeight: style.fontWeight === "bold" ? "normal" : "bold",
           })
         }
-        className={`w-5 h-5 text-[10px] font-bold border rounded flex items-center justify-center ${style.fontWeight === "bold" ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-100"}`}
+        className={`w-7 h-7 text-xs font-bold border rounded flex items-center justify-center ${style.fontWeight === "bold" ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-100"}`}
       >
         B
       </button>
@@ -130,7 +133,7 @@ function FormatBar({
             fontStyle: style.fontStyle === "italic" ? "normal" : "italic",
           })
         }
-        className={`w-5 h-5 text-[10px] italic border rounded flex items-center justify-center ${style.fontStyle === "italic" ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-100"}`}
+        className={`w-7 h-7 text-xs italic border rounded flex items-center justify-center ${style.fontStyle === "italic" ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-100"}`}
       >
         I
       </button>
@@ -143,7 +146,7 @@ function FormatBar({
               style.textDecoration === "underline" ? "none" : "underline",
           })
         }
-        className={`w-5 h-5 text-[10px] underline border rounded flex items-center justify-center ${style.textDecoration === "underline" ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-100"}`}
+        className={`w-7 h-7 text-xs underline border rounded flex items-center justify-center ${style.textDecoration === "underline" ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-100"}`}
       >
         U
       </button>
@@ -156,7 +159,7 @@ function FormatBar({
               style.textTransform === "uppercase" ? "none" : "uppercase",
           })
         }
-        className={`w-5 h-5 text-[10px] border rounded flex items-center justify-center ${style.textTransform === "uppercase" ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-100"}`}
+        className={`w-7 h-7 text-xs border rounded flex items-center justify-center ${style.textTransform === "uppercase" ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-100"}`}
       >
         Aa
       </button>
@@ -164,7 +167,7 @@ function FormatBar({
         type="color"
         value={style.color || "#000000"}
         onChange={(e) => onChange({ ...style, color: e.target.value })}
-        className="w-5 h-5 border border-gray-200 rounded cursor-pointer p-0"
+        className="w-7 h-7 border border-gray-200 rounded cursor-pointer p-0"
         title="Text color"
       />
     </div>
@@ -407,9 +410,9 @@ export default function ResumePreview({
                     skills: { ...resume.skills, ["New Category"]: ["Skill 1"] },
                   })
                 }
-                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1"
+                className="text-sm text-blue-500 hover:text-blue-700 flex items-center gap-1.5 mt-1.5 py-1"
               >
-                <Plus size={11} /> Add skill category
+                <Plus size={14} /> Add skill category
               </button>
             )}
           </EditableSection>
@@ -478,9 +481,9 @@ export default function ResumePreview({
                     ],
                   })
                 }
-                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1"
+                className="text-sm text-blue-500 hover:text-blue-700 flex items-center gap-1.5 mt-1.5 py-1"
               >
-                <Plus size={11} /> Add experience
+                <Plus size={14} /> Add experience
               </button>
             )}
           </EditableSection>
@@ -545,9 +548,9 @@ export default function ResumePreview({
                     ],
                   })
                 }
-                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1"
+                className="text-sm text-blue-500 hover:text-blue-700 flex items-center gap-1.5 mt-1.5 py-1"
               >
-                <Plus size={11} /> Add project
+                <Plus size={14} /> Add project
               </button>
             )}
           </EditableSection>
@@ -610,9 +613,9 @@ export default function ResumePreview({
                     ],
                   })
                 }
-                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1"
+                className="text-sm text-blue-500 hover:text-blue-700 flex items-center gap-1.5 mt-1.5 py-1"
               >
-                <Plus size={11} /> Add education
+                <Plus size={14} /> Add education
               </button>
             )}
           </EditableSection>
@@ -657,9 +660,9 @@ export default function ResumePreview({
                         },
                       });
                     }}
-                    className="opacity-0 group-hover/citem:opacity-100 text-red-400 hover:text-red-600 mt-0.5 flex-shrink-0"
+                    className="opacity-0 group-hover/citem:opacity-100 text-red-400 hover:text-red-600 mt-0.5 flex-shrink-0 p-1 rounded-md hover:bg-red-50"
                   >
-                    <Trash2 size={11} />
+                    <Trash2 size={16} />
                   </button>
                 )}
                 <span className="text-gray-400 mt-0.5 flex-shrink-0">•</span>
@@ -693,9 +696,9 @@ export default function ResumePreview({
                     },
                   })
                 }
-                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1"
+                className="text-sm text-blue-500 hover:text-blue-700 flex items-center gap-1.5 mt-1.5 py-1"
               >
-                <Plus size={11} /> Add item
+                <Plus size={14} /> Add item
               </button>
             )}
           </EditableSection>
@@ -706,164 +709,167 @@ export default function ResumePreview({
 
   return (
     <ElementStyleCtx.Provider
-      value={{ styles: elementStyles, setStyle: onUpdate ? setElementStyle : () => {} }}
+      value={{
+        styles: elementStyles,
+        setStyle: onUpdate ? setElementStyle : () => {},
+      }}
     >
-    <StyleCtx.Provider
-      value={{ ...accent, sectionHeaderCase: settings.sectionHeaderCase }}
-    >
-      <div
-        id="resume-preview"
-        className="bg-white text-gray-900 p-4 sm:p-8 max-w-[800px] mx-auto shadow-lg"
-        style={{
-          fontFamily: fontFamilyCSS(settings.fontStyle),
-          fontSize: fontSizePx(settings.fontSize),
-          lineHeight: lineHeightVal(settings.lineHeight),
-        }}
+      <StyleCtx.Provider
+        value={{ ...accent, sectionHeaderCase: settings.sectionHeaderCase }}
       >
-        {/* Header */}
         <div
-          className={`pb-4 mb-4 border-b-2 ${settings.headerAlign === "center" ? "text-center" : "text-left"}`}
-          style={{ borderColor: accent.headerBorder }}
+          id="resume-preview"
+          className="bg-white text-gray-900 p-4 sm:p-8 max-w-[800px] mx-auto shadow-lg"
+          style={{
+            fontFamily: fontFamilyCSS(settings.fontStyle),
+            fontSize: fontSizePx(settings.fontSize),
+            lineHeight: lineHeightVal(settings.lineHeight),
+          }}
         >
-          <h1
-            className="tracking-wide text-gray-900"
-            style={{
-              fontSize: nameSizePx(settings.nameSize),
-              textTransform:
-                settings.nameCase === "uppercase" ? "uppercase" : "none",
-              fontWeight: settings.nameBold ? 700 : 400,
-            }}
+          {/* Header */}
+          <div
+            className={`pb-4 mb-4 border-b-2 ${settings.headerAlign === "center" ? "text-center" : "text-left"}`}
+            style={{ borderColor: accent.headerBorder }}
           >
-            <E
-              value={resume.name}
-              bold={settings.nameBold}
-              onSave={onUpdate ? (v) => upd({ name: v }) : undefined}
-              styleKey="name"
-            />
-          </h1>
-          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4 text-xs text-gray-600">
-            {resume.email && (
-              <E
-                value={resume.email}
-                onSave={onUpdate ? (v) => upd({ email: v }) : undefined}
-                onDelete={onUpdate ? () => upd({ email: "" }) : undefined}
-                styleKey="contact"
-              />
-            )}
-            {resume.phone && (
-              <E
-                value={resume.phone}
-                onSave={onUpdate ? (v) => upd({ phone: v }) : undefined}
-                onDelete={onUpdate ? () => upd({ phone: "" }) : undefined}
-                styleKey="contact"
-              />
-            )}
-            {resume.location && (
-              <E
-                value={resume.location}
-                onSave={onUpdate ? (v) => upd({ location: v }) : undefined}
-                onDelete={onUpdate ? () => upd({ location: "" }) : undefined}
-                styleKey="contact"
-              />
-            )}
-            {resume.linkedin && (
-              <E
-                value={resume.linkedin}
-                onSave={onUpdate ? (v) => upd({ linkedin: v }) : undefined}
-                onDelete={onUpdate ? () => upd({ linkedin: "" }) : undefined}
-                styleKey="contact"
-              />
-            )}
-            {resume.github && (
-              <E
-                value={resume.github}
-                onSave={onUpdate ? (v) => upd({ github: v }) : undefined}
-                onDelete={onUpdate ? () => upd({ github: "" }) : undefined}
-                styleKey="contact"
-              />
-            )}
-            {resume.website && (
-              <E
-                value={resume.website}
-                onSave={onUpdate ? (v) => upd({ website: v }) : undefined}
-                onDelete={onUpdate ? () => upd({ website: "" }) : undefined}
-                styleKey="contact"
-              />
-            )}
-            {(resume.extraContact ?? []).map((c, i) => (
-              <E
-                key={i}
-                value={c}
-                onSave={
-                  onUpdate
-                    ? (v) => {
-                        const arr = [...(resume.extraContact ?? [])];
-                        arr[i] = v;
-                        upd({ extraContact: arr });
-                      }
-                    : undefined
-                }
-                onDelete={
-                  onUpdate
-                    ? () =>
-                        upd({
-                          extraContact: (resume.extraContact ?? []).filter(
-                            (_, j) => j !== i,
-                          ),
-                        })
-                    : undefined
-                }
-                styleKey="contact"
-              />
-            ))}
-            {onUpdate && <AddContactButton resume={resume} upd={upd} />}
-          </div>
-        </div>
-
-        {/* Sections — sortable */}
-        {onUpdate ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleSectionDragEnd}
-          >
-            <SortableContext
-              items={sectionOrder}
-              strategy={verticalListSortingStrategy}
-            >
-              {sectionOrder.map((key) => (
-                <SortableSectionWrapper key={key} id={key}>
-                  {renderSection(key)}
-                </SortableSectionWrapper>
-              ))}
-            </SortableContext>
-          </DndContext>
-        ) : (
-          sectionOrder.map((key) => renderSection(key))
-        )}
-
-        {/* Add section button */}
-        {onUpdate && (
-          <div className="mt-2 flex items-center gap-2">
-            <AddSectionButton
-              currentOrder={sectionOrder}
-              onAdd={(key) => upd({ sectionOrder: [...sectionOrder, key] })}
-              onAddCustom={(name) => {
-                const key = `custom_${Date.now()}`;
-                upd({
-                  sectionOrder: [...sectionOrder, key],
-                  sectionTitles: { ...sectionTitles, [key]: name },
-                  customSections: {
-                    ...resume.customSections,
-                    [key]: { title: name, items: ["New item"] },
-                  },
-                });
+            <h1
+              className="tracking-wide text-gray-900"
+              style={{
+                fontSize: nameSizePx(settings.nameSize),
+                textTransform:
+                  settings.nameCase === "uppercase" ? "uppercase" : "none",
+                fontWeight: settings.nameBold ? 700 : 400,
               }}
-            />
+            >
+              <E
+                value={resume.name}
+                bold={settings.nameBold}
+                onSave={onUpdate ? (v) => upd({ name: v }) : undefined}
+                styleKey="name"
+              />
+            </h1>
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4 text-xs text-gray-600">
+              {resume.email && (
+                <E
+                  value={resume.email}
+                  onSave={onUpdate ? (v) => upd({ email: v }) : undefined}
+                  onDelete={onUpdate ? () => upd({ email: "" }) : undefined}
+                  styleKey="contact"
+                />
+              )}
+              {resume.phone && (
+                <E
+                  value={resume.phone}
+                  onSave={onUpdate ? (v) => upd({ phone: v }) : undefined}
+                  onDelete={onUpdate ? () => upd({ phone: "" }) : undefined}
+                  styleKey="contact"
+                />
+              )}
+              {resume.location && (
+                <E
+                  value={resume.location}
+                  onSave={onUpdate ? (v) => upd({ location: v }) : undefined}
+                  onDelete={onUpdate ? () => upd({ location: "" }) : undefined}
+                  styleKey="contact"
+                />
+              )}
+              {resume.linkedin && (
+                <E
+                  value={resume.linkedin}
+                  onSave={onUpdate ? (v) => upd({ linkedin: v }) : undefined}
+                  onDelete={onUpdate ? () => upd({ linkedin: "" }) : undefined}
+                  styleKey="contact"
+                />
+              )}
+              {resume.github && (
+                <E
+                  value={resume.github}
+                  onSave={onUpdate ? (v) => upd({ github: v }) : undefined}
+                  onDelete={onUpdate ? () => upd({ github: "" }) : undefined}
+                  styleKey="contact"
+                />
+              )}
+              {resume.website && (
+                <E
+                  value={resume.website}
+                  onSave={onUpdate ? (v) => upd({ website: v }) : undefined}
+                  onDelete={onUpdate ? () => upd({ website: "" }) : undefined}
+                  styleKey="contact"
+                />
+              )}
+              {(resume.extraContact ?? []).map((c, i) => (
+                <E
+                  key={i}
+                  value={c}
+                  onSave={
+                    onUpdate
+                      ? (v) => {
+                          const arr = [...(resume.extraContact ?? [])];
+                          arr[i] = v;
+                          upd({ extraContact: arr });
+                        }
+                      : undefined
+                  }
+                  onDelete={
+                    onUpdate
+                      ? () =>
+                          upd({
+                            extraContact: (resume.extraContact ?? []).filter(
+                              (_, j) => j !== i,
+                            ),
+                          })
+                      : undefined
+                  }
+                  styleKey="contact"
+                />
+              ))}
+              {onUpdate && <AddContactButton resume={resume} upd={upd} />}
+            </div>
           </div>
-        )}
-      </div>
-    </StyleCtx.Provider>
+
+          {/* Sections — sortable */}
+          {onUpdate ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleSectionDragEnd}
+            >
+              <SortableContext
+                items={sectionOrder}
+                strategy={verticalListSortingStrategy}
+              >
+                {sectionOrder.map((key) => (
+                  <SortableSectionWrapper key={key} id={key}>
+                    {renderSection(key)}
+                  </SortableSectionWrapper>
+                ))}
+              </SortableContext>
+            </DndContext>
+          ) : (
+            sectionOrder.map((key) => renderSection(key))
+          )}
+
+          {/* Add section button */}
+          {onUpdate && (
+            <div className="mt-2 flex items-center gap-2">
+              <AddSectionButton
+                currentOrder={sectionOrder}
+                onAdd={(key) => upd({ sectionOrder: [...sectionOrder, key] })}
+                onAddCustom={(name) => {
+                  const key = `custom_${Date.now()}`;
+                  upd({
+                    sectionOrder: [...sectionOrder, key],
+                    sectionTitles: { ...sectionTitles, [key]: name },
+                    customSections: {
+                      ...resume.customSections,
+                      [key]: { title: name, items: ["New item"] },
+                    },
+                  });
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </StyleCtx.Provider>
     </ElementStyleCtx.Provider>
   );
 }
@@ -926,11 +932,19 @@ function EditableSection({
   const [draft, setDraft] = useState(title);
 
   const styleKey = `sectionTitle_${sectionKey}`;
-  const elemStyle = (ctx?.styles[styleKey]) || {};
+  const elemStyle = ctx?.styles[styleKey] || {};
   const inlineStyle = elementInlineStyle(elemStyle);
 
   const caseStyle =
-    c.sectionHeaderCase === "uppercase" && !elemStyle.textTransform ? "uppercase" : elemStyle.textTransform === "uppercase" ? "uppercase" : elemStyle.textTransform === "none" ? "normal-case" : c.sectionHeaderCase === "uppercase" ? "uppercase" : "normal-case";
+    c.sectionHeaderCase === "uppercase" && !elemStyle.textTransform
+      ? "uppercase"
+      : elemStyle.textTransform === "uppercase"
+        ? "uppercase"
+        : elemStyle.textTransform === "none"
+          ? "normal-case"
+          : c.sectionHeaderCase === "uppercase"
+            ? "uppercase"
+            : "normal-case";
 
   return (
     <div className="mb-4">
@@ -966,15 +980,15 @@ function EditableSection({
                   onTitleChange(draft.trim());
                   setEditing(false);
                 }}
-                className="text-green-600 hover:text-green-700"
+                className="text-green-600 hover:text-green-700 p-1 rounded-md hover:bg-green-50 active:bg-green-100"
               >
-                <Check size={11} />
+                <Check size={16} />
               </button>
               <button
                 onClick={() => setEditing(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 active:bg-gray-200"
               >
-                <X size={11} />
+                <X size={16} />
               </button>
             </span>
           </span>
@@ -997,10 +1011,10 @@ function EditableSection({
         {onDelete && !editing && (
           <button
             onClick={onDelete}
-            className="opacity-0 group-hover/section:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
+            className="opacity-0 group-hover/section:opacity-100 text-red-400 hover:text-red-600 transition-opacity p-1 rounded-md hover:bg-red-50"
             title="Remove section"
           >
-            <Trash2 size={11} />
+            <Trash2 size={16} />
           </button>
         )}
       </div>
@@ -1044,7 +1058,7 @@ function AddContactButton({
         className="text-blue-500 hover:text-blue-700 flex items-center gap-0.5"
         title="Add contact info"
       >
-        <Plus size={11} />
+        <Plus size={14} />
       </button>
       {open && (
         <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[180px] text-left">
@@ -1116,9 +1130,9 @@ function AddSectionButton({
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
+        className="text-sm text-blue-500 hover:text-blue-700 flex items-center gap-1.5 py-1"
       >
-        <Plus size={11} /> Add section
+        <Plus size={14} /> Add section
       </button>
       {open && (
         <div className="absolute bottom-full mb-1 left-0 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[200px]">
@@ -1208,7 +1222,7 @@ function SortableExpItem({
             {...listeners}
             className="opacity-0 group-hover/exp:opacity-100 cursor-grab text-gray-300 hover:text-gray-500 transition-opacity mt-0.5 flex-shrink-0"
           >
-            <GripVertical size={12} />
+            <GripVertical size={14} />
           </div>
           <div className="flex flex-wrap items-baseline gap-x-1">
             <E
@@ -1269,10 +1283,10 @@ function SortableExpItem({
             onClick={() =>
               upd({ experience: resume.experience.filter((_, j) => j !== idx) })
             }
-            className="opacity-0 group-hover/exp:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex-shrink-0"
+            className="opacity-0 group-hover/exp:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex-shrink-0 p-1 rounded-md hover:bg-red-50"
             title="Remove"
           >
-            <Trash2 size={12} />
+            <Trash2 size={16} />
           </button>
         </div>
       </div>
@@ -1336,9 +1350,9 @@ function SortableExpItem({
                     ),
                   });
                 }}
-                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-0.5"
+                className="text-sm text-blue-500 hover:text-blue-700 flex items-center gap-1.5 mt-1 py-1"
               >
-                <Plus size={11} /> Add bullet
+                <Plus size={14} /> Add bullet
               </button>
             </li>
           </ul>
@@ -1414,10 +1428,16 @@ function SortableBullet({
         {...listeners}
         className="opacity-0 group-hover/bullet:opacity-100 cursor-grab text-gray-300 hover:text-gray-500 transition-opacity mt-0.5 flex-shrink-0"
       >
-        <GripVertical size={10} />
+        <GripVertical size={14} />
       </span>
       <span className="flex-1">
-        <E value={value} wide onSave={onSave} onDelete={onDelete} styleKey="bullet" />
+        <E
+          value={value}
+          wide
+          onSave={onSave}
+          onDelete={onDelete}
+          styleKey="bullet"
+        />
       </span>
     </li>
   );
@@ -1459,7 +1479,7 @@ function SortableProjItem({
             {...listeners}
             className="opacity-0 group-hover/proj:opacity-100 cursor-grab text-gray-300 hover:text-gray-500 transition-opacity mt-0.5 flex-shrink-0"
           >
-            <GripVertical size={12} />
+            <GripVertical size={14} />
           </div>
           <E
             value={proj.name}
@@ -1489,10 +1509,10 @@ function SortableProjItem({
             onClick={() =>
               upd({ projects: resume.projects.filter((_, j) => j !== idx) })
             }
-            className="opacity-0 group-hover/proj:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex-shrink-0"
+            className="opacity-0 group-hover/proj:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex-shrink-0 p-1 rounded-md hover:bg-red-50"
             title="Remove"
           >
-            <Trash2 size={12} />
+            <Trash2 size={16} />
           </button>
         </div>
       </div>
@@ -1598,7 +1618,7 @@ function SortableEduItem({
           {...listeners}
           className="opacity-0 group-hover/edu:opacity-100 cursor-grab text-gray-300 hover:text-gray-500 transition-opacity flex-shrink-0"
         >
-          <GripVertical size={12} />
+          <GripVertical size={14} />
         </div>
         <div className="flex flex-wrap items-baseline gap-x-1">
           <E
@@ -1657,10 +1677,10 @@ function SortableEduItem({
           onClick={() =>
             upd({ education: resume.education.filter((_, j) => j !== idx) })
           }
-          className="opacity-0 group-hover/edu:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex-shrink-0"
+          className="opacity-0 group-hover/edu:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex-shrink-0 p-1 rounded-md hover:bg-red-50"
           title="Remove"
         >
-          <Trash2 size={12} />
+          <Trash2 size={16} />
         </button>
       </div>
     </div>
@@ -1804,22 +1824,22 @@ function E({
               onSave(draft.trim());
               setEditing(false);
             }}
-            className="text-green-600 hover:text-green-700 flex-shrink-0"
+            className="text-green-600 hover:text-green-700 flex-shrink-0 p-1 rounded-md hover:bg-green-50 active:bg-green-100"
           >
-            <Check size={11} />
+            <Check size={16} />
           </button>
           <button
             onClick={() => setEditing(false)}
-            className="text-gray-400 hover:text-gray-600 flex-shrink-0"
+            className="text-gray-400 hover:text-gray-600 flex-shrink-0 p-1 rounded-md hover:bg-gray-100 active:bg-gray-200"
           >
-            <X size={11} />
+            <X size={16} />
           </button>
           {onDelete && (
             <button
               onClick={onDelete}
-              className="text-red-400 hover:text-red-600 flex-shrink-0"
+              className="text-red-400 hover:text-red-600 flex-shrink-0 p-1 rounded-md hover:bg-red-50 active:bg-red-100"
             >
-              <Trash2 size={11} />
+              <Trash2 size={16} />
             </button>
           )}
         </span>
@@ -1909,15 +1929,15 @@ function EBlock({
               onSave(draft.trim());
               setEditing(false);
             }}
-            className="text-xs text-green-600 hover:text-green-700 flex items-center gap-1"
+            className="text-sm text-green-600 hover:text-green-700 flex items-center gap-1 px-2 py-1 rounded-md hover:bg-green-50 active:bg-green-100"
           >
-            <Check size={11} /> Save
+            <Check size={16} /> Save
           </button>
           <button
             onClick={() => setEditing(false)}
-            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+            className="text-sm text-gray-400 hover:text-gray-600 flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 active:bg-gray-200"
           >
-            <X size={11} /> Cancel
+            <X size={16} /> Cancel
           </button>
         </div>
       </div>
@@ -2020,22 +2040,22 @@ function EditableSkillRow({
               );
               setEditing(false);
             }}
-            className="text-green-600 hover:text-green-700"
+            className="text-green-600 hover:text-green-700 p-1 rounded-md hover:bg-green-50 active:bg-green-100"
           >
-            <Check size={12} />
+            <Check size={16} />
           </button>
           <button
             onClick={() => setEditing(false)}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 active:bg-gray-200"
           >
-            <X size={12} />
+            <X size={16} />
           </button>
           {onDelete && (
             <button
               onClick={onDelete}
-              className="text-red-400 hover:text-red-600"
+              className="text-red-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50 active:bg-red-100"
             >
-              <Trash2 size={12} />
+              <Trash2 size={16} />
             </button>
           )}
         </div>
@@ -2105,15 +2125,15 @@ function ProjectUrlEditor({
             onSave(draft.trim());
             setEditing(false);
           }}
-          className="text-green-600 hover:text-green-700"
+          className="text-green-600 hover:text-green-700 p-1 rounded-md hover:bg-green-50 active:bg-green-100"
         >
-          <Check size={12} />
+          <Check size={16} />
         </button>
         <button
           onClick={() => setEditing(false)}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 active:bg-gray-200"
         >
-          <X size={12} />
+          <X size={16} />
         </button>
       </span>
     );
@@ -2138,7 +2158,7 @@ function ProjectUrlEditor({
         className="text-gray-400 hover:text-blue-500 transition-colors"
         title="Edit link"
       >
-        {url ? <Pencil size={11} /> : <Link2 size={13} />}
+        {url ? <Pencil size={14} /> : <Link2 size={13} />}
       </button>
     </span>
   );
