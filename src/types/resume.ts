@@ -35,6 +35,7 @@ export interface Resume {
   linkedin?: string;
   github?: string;
   website?: string;
+  extraContact?: string[];
   summary: string;
   skills: Record<string, string[]>;
   experience: ResumeExperience[];

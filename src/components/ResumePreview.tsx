@@ -283,12 +283,20 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
             <E value={resume.name} bold onSave={onUpdate ? (v) => upd({ name: v }) : undefined} />
           </h1>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4 text-xs text-gray-600">
-            <E value={resume.email} onSave={onUpdate ? (v) => upd({ email: v }) : undefined} />
-            <E value={resume.phone} onSave={onUpdate ? (v) => upd({ phone: v }) : undefined} />
-            <E value={resume.location} onSave={onUpdate ? (v) => upd({ location: v }) : undefined} />
-            {resume.linkedin && <E value={resume.linkedin} onSave={onUpdate ? (v) => upd({ linkedin: v }) : undefined} />}
-            {resume.github && <E value={resume.github} onSave={onUpdate ? (v) => upd({ github: v }) : undefined} />}
-            {resume.website && <E value={resume.website} onSave={onUpdate ? (v) => upd({ website: v }) : undefined} />}
+            {resume.email && <E value={resume.email} onSave={onUpdate ? (v) => upd({ email: v }) : undefined} onDelete={onUpdate ? () => upd({ email: "" }) : undefined} />}
+            {resume.phone && <E value={resume.phone} onSave={onUpdate ? (v) => upd({ phone: v }) : undefined} onDelete={onUpdate ? () => upd({ phone: "" }) : undefined} />}
+            {resume.location && <E value={resume.location} onSave={onUpdate ? (v) => upd({ location: v }) : undefined} onDelete={onUpdate ? () => upd({ location: "" }) : undefined} />}
+            {resume.linkedin && <E value={resume.linkedin} onSave={onUpdate ? (v) => upd({ linkedin: v }) : undefined} onDelete={onUpdate ? () => upd({ linkedin: "" }) : undefined} />}
+            {resume.github && <E value={resume.github} onSave={onUpdate ? (v) => upd({ github: v }) : undefined} onDelete={onUpdate ? () => upd({ github: "" }) : undefined} />}
+            {resume.website && <E value={resume.website} onSave={onUpdate ? (v) => upd({ website: v }) : undefined} onDelete={onUpdate ? () => upd({ website: "" }) : undefined} />}
+            {(resume.extraContact ?? []).map((c, i) => (
+              <E key={i} value={c} onSave={onUpdate ? (v) => {
+                const arr = [...(resume.extraContact ?? [])];
+                arr[i] = v;
+                upd({ extraContact: arr });
+              } : undefined} onDelete={onUpdate ? () => upd({ extraContact: (resume.extraContact ?? []).filter((_, j) => j !== i) }) : undefined} />
+            ))}
+            {onUpdate && <AddContactButton resume={resume} upd={upd} />}
           </div>
         </div>
 
@@ -378,6 +386,46 @@ function EditableSection({ sectionKey, title, children, onTitleChange, onDelete,
       </div>
       {children}
     </div>
+  );
+}
+
+/* ── Add contact info button ── */
+const CONTACT_FIELDS: { key: keyof Resume; label: string; placeholder: string }[] = [
+  { key: "email", label: "Email", placeholder: "email@example.com" },
+  { key: "phone", label: "Phone", placeholder: "+1 (555) 123-4567" },
+  { key: "location", label: "Location", placeholder: "City, State" },
+  { key: "linkedin", label: "LinkedIn", placeholder: "linkedin.com/in/yourname" },
+  { key: "github", label: "GitHub", placeholder: "github.com/yourname" },
+  { key: "website", label: "Website", placeholder: "yourwebsite.com" },
+];
+
+function AddContactButton({ resume, upd }: { resume: Resume; upd: (p: Partial<Resume>) => void }) {
+  const [open, setOpen] = useState(false);
+  const [customVal, setCustomVal] = useState("");
+  const missing = CONTACT_FIELDS.filter(f => !resume[f.key]);
+  return (
+    <span className="relative inline-block">
+      <button onClick={() => setOpen(!open)} className="text-blue-500 hover:text-blue-700 flex items-center gap-0.5" title="Add contact info">
+        <Plus size={11} />
+      </button>
+      {open && (
+        <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[180px] text-left">
+          {missing.map(f => (
+            <button key={f.key} onClick={() => { upd({ [f.key]: f.placeholder }); setOpen(false); }}
+              className="block w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-blue-50 whitespace-nowrap">
+              {f.label}
+            </button>
+          ))}
+          <div className="border-t border-gray-100 mt-1 pt-1 px-2 pb-1">
+            <form onSubmit={(e) => { e.preventDefault(); if (customVal.trim()) { upd({ extraContact: [...(resume.extraContact ?? []), customVal.trim()] }); setCustomVal(""); setOpen(false); } }} className="flex gap-1">
+              <input type="text" placeholder="Custom field..." value={customVal} onChange={(e) => setCustomVal(e.target.value)}
+                className="flex-1 text-xs border border-gray-200 rounded px-2 py-1 outline-none focus:border-blue-400" autoFocus />
+              <button type="submit" className="text-xs text-white bg-blue-500 hover:bg-blue-600 rounded px-2 py-1">Add</button>
+            </form>
+          </div>
+        </div>
+      )}
+    </span>
   );
 }
 
