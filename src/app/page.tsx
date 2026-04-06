@@ -15,6 +15,7 @@ import {
   PenLine,
   PanelLeft,
   Eye,
+  Undo2,
 } from "lucide-react";
 import ResumePreview from "@/components/ResumePreview";
 import ResumeChatPanel from "@/components/ResumeChatPanel";
@@ -74,6 +75,31 @@ export default function Home() {
   const [dragging, setDragging] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [mobileView, setMobileView] = useState<"input" | "preview">("input");
+
+  /* ── Undo history ── */
+  const undoStack = useRef<{ tab: Tab; resume: Resume }[]>([]);
+  const MAX_UNDO = 50;
+
+  function pushUndo(tab: Tab, resume: Resume) {
+    undoStack.current = [
+      ...undoStack.current.slice(-(MAX_UNDO - 1)),
+      { tab, resume: JSON.parse(JSON.stringify(resume)) },
+    ];
+  }
+
+  const handleUndo = useCallback(() => {
+    const entry = undoStack.current.pop();
+    if (!entry) return;
+    if (entry.tab === "tailored") {
+      setTailoredResume(entry.resume);
+    } else {
+      setOriginalResume(entry.resume);
+    }
+    // Force correct tab
+    setActiveTab(entry.tab);
+  }, []);
+
+  const canUndo = undoStack.current.length > 0;
   const [settings, setSettings] = useState<ResumeSettings>(() => {
     if (typeof window === "undefined") return DEFAULT_SETTINGS;
     try {
@@ -112,6 +138,21 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem("rt_settings", JSON.stringify(settings));
   }, [settings]);
+
+  // Ctrl+Z / Cmd+Z undo
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
+        // Only intercept if not inside a text input/textarea
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+        e.preventDefault();
+        handleUndo();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [handleUndo]);
 
   const displayedResume =
     activeTab === "tailored" && tailoredResume
@@ -540,6 +581,15 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
+                onClick={handleUndo}
+                disabled={!canUndo}
+                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 text-xs bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                title="Undo (Ctrl+Z)"
+              >
+                <Undo2 size={13} />
+                <span className="hidden sm:inline">Undo</span>
+              </button>
+              <button
                 onClick={() => setShowSettings(true)}
                 className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 text-xs bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg transition-colors font-medium"
               >
@@ -593,9 +643,12 @@ export default function Home() {
                   resume={displayedResume}
                   settings={settings}
                   onUpdate={(updated) => {
-                    if (activeTab === "tailored") {
+                    // Push current state to undo stack before applying
+                    if (activeTab === "tailored" && tailoredResume) {
+                      pushUndo("tailored", tailoredResume);
                       setTailoredResume(updated);
-                    } else {
+                    } else if (originalResume) {
+                      pushUndo("original", originalResume);
                       setOriginalResume(updated);
                     }
                   }}
