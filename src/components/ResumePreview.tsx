@@ -372,6 +372,7 @@ export default function ResumePreview({
                     key={label}
                     label={label}
                     items={items}
+                    styleKey="tech"
                     onSave={
                       onUpdate
                         ? (newLabel, newItems) => {
@@ -920,11 +921,16 @@ function EditableSection({
   editable: boolean;
 }) {
   const c = useContext(StyleCtx);
+  const ctx = useContext(ElementStyleCtx);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(title);
 
+  const styleKey = `sectionTitle_${sectionKey}`;
+  const elemStyle = (ctx?.styles[styleKey]) || {};
+  const inlineStyle = elementInlineStyle(elemStyle);
+
   const caseStyle =
-    c.sectionHeaderCase === "uppercase" ? "uppercase" : "normal-case";
+    c.sectionHeaderCase === "uppercase" && !elemStyle.textTransform ? "uppercase" : elemStyle.textTransform === "uppercase" ? "uppercase" : elemStyle.textTransform === "none" ? "normal-case" : c.sectionHeaderCase === "uppercase" ? "uppercase" : "normal-case";
 
   return (
     <div className="mb-4">
@@ -933,41 +939,49 @@ function EditableSection({
         style={{ borderColor: c.sectionBorder }}
       >
         {editing && onTitleChange ? (
-          <span className="inline-flex items-center gap-1">
-            <input
-              autoFocus
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
+          <span className="inline-flex flex-col flex-1">
+            {ctx && (
+              <FormatBar
+                style={elemStyle}
+                onChange={(s) => ctx.setStyle(styleKey, s)}
+              />
+            )}
+            <span className="inline-flex items-center gap-1">
+              <input
+                autoFocus
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    onTitleChange(draft.trim());
+                    setEditing(false);
+                  }
+                  if (e.key === "Escape") setEditing(false);
+                }}
+                className={`text-xs font-bold ${caseStyle} tracking-widest border border-blue-400 rounded px-1 py-0 outline-none`}
+                style={{ color: c.sectionText, ...inlineStyle }}
+              />
+              <button
+                onClick={() => {
                   onTitleChange(draft.trim());
                   setEditing(false);
-                }
-                if (e.key === "Escape") setEditing(false);
-              }}
-              className={`text-xs font-bold ${caseStyle} tracking-widest border border-blue-400 rounded px-1 py-0 outline-none`}
-              style={{ color: c.sectionText }}
-            />
-            <button
-              onClick={() => {
-                onTitleChange(draft.trim());
-                setEditing(false);
-              }}
-              className="text-green-600 hover:text-green-700"
-            >
-              <Check size={11} />
-            </button>
-            <button
-              onClick={() => setEditing(false)}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X size={11} />
-            </button>
+                }}
+                className="text-green-600 hover:text-green-700"
+              >
+                <Check size={11} />
+              </button>
+              <button
+                onClick={() => setEditing(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={11} />
+              </button>
+            </span>
           </span>
         ) : (
           <h2
             className={`text-xs font-bold ${caseStyle} tracking-widest flex-1 ${editable ? "cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors" : ""}`}
-            style={{ color: c.sectionText }}
+            style={{ color: c.sectionText, ...inlineStyle }}
             onClick={
               onTitleChange
                 ? () => {
@@ -1931,19 +1945,25 @@ function EditableSkillRow({
   items,
   onSave,
   onDelete,
+  styleKey,
 }: {
   label: string;
   items: string[];
   onSave?: (label: string, items: string[]) => void;
   onDelete?: () => void;
+  styleKey?: string;
 }) {
+  const ctx = useContext(ElementStyleCtx);
   const [editing, setEditing] = useState(false);
   const [draftLabel, setDraftLabel] = useState(label);
   const [draftItems, setDraftItems] = useState(items.join(", "));
 
+  const elemStyle = (styleKey && ctx?.styles[styleKey]) || {};
+  const inlineStyle = elementInlineStyle(elemStyle);
+
   if (!onSave) {
     return (
-      <p className="text-gray-700">
+      <p className="text-gray-700" style={inlineStyle}>
         <span className="font-semibold">{label}: </span>
         {items.join(", ")}
       </p>
@@ -1952,22 +1972,45 @@ function EditableSkillRow({
 
   if (editing) {
     return (
-      <div className="flex gap-1 items-center mb-1">
-        <input
-          value={draftLabel}
-          onChange={(e) => setDraftLabel(e.target.value)}
-          className="border border-blue-400 rounded px-1 py-0 text-xs font-semibold outline-none text-gray-800 w-28"
-          placeholder="Category"
-        />
-        <span className="text-gray-500 text-xs">:</span>
-        <input
-          autoFocus
-          value={draftItems}
-          onChange={(e) => setDraftItems(e.target.value)}
-          className="border border-blue-400 rounded px-1 py-0 text-xs outline-none text-gray-800 flex-1"
-          placeholder="skill1, skill2, ..."
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
+      <div className="flex flex-col gap-1 mb-1">
+        {ctx && styleKey && (
+          <FormatBar
+            style={elemStyle}
+            onChange={(s) => ctx.setStyle(styleKey, s)}
+          />
+        )}
+        <div className="flex gap-1 items-center">
+          <input
+            value={draftLabel}
+            onChange={(e) => setDraftLabel(e.target.value)}
+            className="border border-blue-400 rounded px-1 py-0 text-xs font-semibold outline-none text-gray-800 w-28"
+            placeholder="Category"
+            style={inlineStyle}
+          />
+          <span className="text-gray-500 text-xs">:</span>
+          <input
+            autoFocus
+            value={draftItems}
+            onChange={(e) => setDraftItems(e.target.value)}
+            className="border border-blue-400 rounded px-1 py-0 text-xs outline-none text-gray-800 flex-1"
+            placeholder="skill1, skill2, ..."
+            style={inlineStyle}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onSave(
+                  draftLabel.trim(),
+                  draftItems
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean),
+                );
+                setEditing(false);
+              }
+              if (e.key === "Escape") setEditing(false);
+            }}
+          />
+          <button
+            onClick={() => {
               onSave(
                 draftLabel.trim(),
                 draftItems
@@ -1976,39 +2019,26 @@ function EditableSkillRow({
                   .filter(Boolean),
               );
               setEditing(false);
-            }
-            if (e.key === "Escape") setEditing(false);
-          }}
-        />
-        <button
-          onClick={() => {
-            onSave(
-              draftLabel.trim(),
-              draftItems
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean),
-            );
-            setEditing(false);
-          }}
-          className="text-green-600 hover:text-green-700"
-        >
-          <Check size={12} />
-        </button>
-        <button
-          onClick={() => setEditing(false)}
-          className="text-gray-400 hover:text-gray-600"
-        >
-          <X size={12} />
-        </button>
-        {onDelete && (
-          <button
-            onClick={onDelete}
-            className="text-red-400 hover:text-red-600"
+            }}
+            className="text-green-600 hover:text-green-700"
           >
-            <Trash2 size={12} />
+            <Check size={12} />
           </button>
-        )}
+          <button
+            onClick={() => setEditing(false)}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <X size={12} />
+          </button>
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              className="text-red-400 hover:text-red-600"
+            >
+              <Trash2 size={12} />
+            </button>
+          )}
+        </div>
       </div>
     );
   }
@@ -2017,6 +2047,7 @@ function EditableSkillRow({
     <p
       className="text-gray-700 cursor-pointer hover:bg-yellow-50 rounded px-0.5 transition-colors"
       title="Click to edit"
+      style={inlineStyle}
       onClick={() => {
         setDraftLabel(label);
         setDraftItems(items.join(", "));
