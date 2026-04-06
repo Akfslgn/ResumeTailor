@@ -107,17 +107,33 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
                     newSkills[newLabel] = newItems;
                     upd({ skills: newSkills });
                   } : undefined}
+                  onDelete={onUpdate ? () => {
+                    const newSkills = { ...resume.skills };
+                    delete newSkills[label];
+                    upd({ skills: newSkills });
+                  } : undefined}
                 />
               ) : null
             )}
           </div>
+          {onUpdate && (
+            <button
+              onClick={() => {
+                const newSkills = { ...resume.skills, ["New Category"]: ["Skill 1"] };
+                upd({ skills: newSkills });
+              }}
+              className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1"
+            >
+              <Plus size={11} /> Add skill category
+            </button>
+          )}
         </Section>
 
         {/* Experience */}
-        {resume.experience?.length > 0 && (
+        {(resume.experience?.length > 0 || onUpdate) && (
           <Section title="Professional Experience">
-            {resume.experience.map((exp, i) => (
-              <div key={i} className="mb-4">
+            {resume.experience?.map((exp, i) => (
+              <div key={i} className="mb-4 relative group/exp">
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex flex-wrap items-baseline gap-x-1">
                     <E value={exp.title} bold onSave={onUpdate ? (v) => {
@@ -128,14 +144,25 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
                       upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, company: v } : e) });
                     } : undefined} />
                   </div>
-                  <div className="text-xs text-gray-500 whitespace-nowrap flex items-center gap-1 flex-shrink-0">
-                    <E value={exp.startDate} small onSave={onUpdate ? (v) => {
-                      upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, startDate: v } : e) });
-                    } : undefined} />
-                    <span>–</span>
-                    <E value={exp.endDate} small onSave={onUpdate ? (v) => {
-                      upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, endDate: v } : e) });
-                    } : undefined} />
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <div className="text-xs text-gray-500 whitespace-nowrap flex items-center gap-1">
+                      <E value={exp.startDate} small onSave={onUpdate ? (v) => {
+                        upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, startDate: v } : e) });
+                      } : undefined} />
+                      <span>–</span>
+                      <E value={exp.endDate} small onSave={onUpdate ? (v) => {
+                        upd({ experience: resume.experience.map((e, j) => j === i ? { ...e, endDate: v } : e) });
+                      } : undefined} />
+                    </div>
+                    {onUpdate && (
+                      <button
+                        onClick={() => upd({ experience: resume.experience.filter((_, j) => j !== i) })}
+                        className="opacity-0 group-hover/exp:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex-shrink-0"
+                        title="Remove this experience"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
                   </div>
                 </div>
                 {exp.location && (
@@ -173,24 +200,52 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
                 </ul>
               </div>
             ))}
+            {onUpdate && (
+              <button
+                onClick={() => {
+                  upd({ experience: [...resume.experience, {
+                    company: "Company Name",
+                    title: "Job Title",
+                    location: "City, State",
+                    startDate: "Jan 2023",
+                    endDate: "Present",
+                    bullets: ["Describe what you did"],
+                  }] });
+                }}
+                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1"
+              >
+                <Plus size={11} /> Add experience
+              </button>
+            )}
           </Section>
         )}
 
         {/* Projects */}
-        {resume.projects?.length > 0 && (
+        {(resume.projects?.length > 0 || onUpdate) && (
           <Section title="Projects">
-            {resume.projects.map((proj, i) => (
-              <div key={i} className="mb-3">
+            {resume.projects?.map((proj, i) => (
+              <div key={i} className="mb-3 relative group/proj">
                 <div className="flex justify-between items-start gap-2">
                   <E value={proj.name} bold onSave={onUpdate ? (v) => {
                     upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, name: v } : p) });
                   } : undefined} />
-                  <ProjectUrlEditor
-                    url={proj.url}
-                    onSave={onUpdate ? (url) => {
-                      upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, url } : p) });
-                    } : undefined}
-                  />
+                  <div className="flex items-center gap-1.5">
+                    <ProjectUrlEditor
+                      url={proj.url}
+                      onSave={onUpdate ? (url) => {
+                        upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, url } : p) });
+                      } : undefined}
+                    />
+                    {onUpdate && (
+                      <button
+                        onClick={() => upd({ projects: resume.projects.filter((_, j) => j !== i) })}
+                        className="opacity-0 group-hover/proj:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex-shrink-0"
+                        title="Remove this project"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <EBlock value={proj.description} onSave={onUpdate ? (v) => {
                   upd({ projects: resume.projects.map((p, j) => j === i ? { ...p, description: v } : p) });
@@ -200,14 +255,29 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
                 } : undefined} />
               </div>
             ))}
+            {onUpdate && (
+              <button
+                onClick={() => {
+                  upd({ projects: [...(resume.projects || []), {
+                    name: "Project Name",
+                    description: "Project description",
+                    technologies: ["Tech 1", "Tech 2"],
+                    url: "",
+                  }] });
+                }}
+                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1"
+              >
+                <Plus size={11} /> Add project
+              </button>
+            )}
           </Section>
         )}
 
         {/* Education */}
-        {resume.education?.length > 0 && (
+        {(resume.education?.length > 0 || onUpdate) && (
           <Section title="Education">
-            {resume.education.map((ed, i) => (
-              <div key={i} className="flex flex-wrap justify-between items-baseline mb-1 gap-x-1">
+            {resume.education?.map((ed, i) => (
+              <div key={i} className="flex flex-wrap justify-between items-baseline mb-1 gap-x-1 relative group/edu">
                 <div className="flex flex-wrap items-baseline gap-x-1">
                   <E value={ed.school} bold onSave={onUpdate ? (v) => {
                     upd({ education: resume.education.map((e, j) => j === i ? { ...e, school: v } : e) });
@@ -221,11 +291,37 @@ export default function ResumePreview({ resume, onUpdate, settings = DEFAULT_SET
                     upd({ education: resume.education.map((e, j) => j === i ? { ...e, field: v } : e) });
                   } : undefined} />
                 </div>
-                <E value={ed.graduationDate} small muted onSave={onUpdate ? (v) => {
-                  upd({ education: resume.education.map((e, j) => j === i ? { ...e, graduationDate: v } : e) });
-                } : undefined} />
+                <div className="flex items-center gap-1.5">
+                  <E value={ed.graduationDate} small muted onSave={onUpdate ? (v) => {
+                    upd({ education: resume.education.map((e, j) => j === i ? { ...e, graduationDate: v } : e) });
+                  } : undefined} />
+                  {onUpdate && (
+                    <button
+                      onClick={() => upd({ education: resume.education.filter((_, j) => j !== i) })}
+                      className="opacity-0 group-hover/edu:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex-shrink-0"
+                      title="Remove this education"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
+            {onUpdate && (
+              <button
+                onClick={() => {
+                  upd({ education: [...(resume.education || []), {
+                    school: "University Name",
+                    degree: "Bachelor of Science",
+                    field: "Your Field",
+                    graduationDate: "May 2022",
+                  }] });
+                }}
+                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 mt-1"
+              >
+                <Plus size={11} /> Add education
+              </button>
+            )}
           </Section>
         )}
       </div>
@@ -354,8 +450,8 @@ function EBlock({ value, onSave }: { value: string; onSave?: (v: string) => void
 }
 
 /* ── Editable skill row ── */
-function EditableSkillRow({ label, items, onSave }: {
-  label: string; items: string[]; onSave?: (label: string, items: string[]) => void;
+function EditableSkillRow({ label, items, onSave, onDelete }: {
+  label: string; items: string[]; onSave?: (label: string, items: string[]) => void; onDelete?: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [draftLabel, setDraftLabel] = useState(label);
@@ -384,6 +480,7 @@ function EditableSkillRow({ label, items, onSave }: {
           }} />
         <button onClick={() => { onSave(draftLabel.trim(), draftItems.split(",").map((s) => s.trim()).filter(Boolean)); setEditing(false); }} className="text-green-600 hover:text-green-700"><Check size={12} /></button>
         <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600"><X size={12} /></button>
+        {onDelete && <button onClick={onDelete} className="text-red-400 hover:text-red-600"><Trash2 size={12} /></button>}
       </div>
     );
   }

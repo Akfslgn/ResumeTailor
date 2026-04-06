@@ -12,6 +12,7 @@ import {
   X,
   FileCheck,
   Settings,
+  PenLine,
 } from "lucide-react";
 import ResumePreview from "@/components/ResumePreview";
 import ResumeChatPanel from "@/components/ResumeChatPanel";
@@ -173,6 +174,38 @@ export default function Home() {
   }, []);
 
   const hasResult = originalResume !== null;
+
+  function handleManualCreate() {
+    const blank: Resume = {
+      name: "Your Name",
+      email: "email@example.com",
+      phone: "+1 555 000 0000",
+      location: "City, State",
+      linkedin: "",
+      github: "",
+      website: "",
+      summary: "Write your professional summary here.",
+      skills: { "Languages": ["Skill 1", "Skill 2"], "Frameworks": ["Framework 1"], "Tools": ["Tool 1"] },
+      experience: [{
+        company: "Company Name",
+        title: "Job Title",
+        location: "City, State",
+        startDate: "Jan 2023",
+        endDate: "Present",
+        bullets: ["Describe what you did here"],
+      }],
+      education: [{
+        school: "University Name",
+        degree: "Bachelor of Science",
+        field: "Your Field",
+        graduationDate: "May 2022",
+      }],
+      projects: [],
+    };
+    setOriginalResume(blank);
+    setTailoredResume(blank);
+    setActiveTab("tailored");
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col">
@@ -455,6 +488,18 @@ export default function Home() {
                   <Step n={3} text="Click Tailor Resume with AI" />
                   <Step n={4} text="Download as PDF" />
                 </div>
+                <div className="flex items-center gap-3 mt-2">
+                  <div className="h-px w-12 bg-slate-300" />
+                  <span className="text-xs text-slate-400">or</span>
+                  <div className="h-px w-12 bg-slate-300" />
+                </div>
+                <button
+                  onClick={handleManualCreate}
+                  className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <PenLine size={15} />
+                  Build Manually
+                </button>
               </div>
             ) : (
               displayedResume && (
