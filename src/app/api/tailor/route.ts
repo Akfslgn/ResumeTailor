@@ -109,6 +109,10 @@ JOB DESCRIPTION:
 ${jobDescription.slice(0, 4000)}
 ---
 
+CRITICAL REMINDER — READ BEFORE GENERATING:
+The "tailored" summary MUST ONLY mention technologies, tools, and type of work. NO project names, NO company names, NO metrics like "500+ users" or "30% faster". If the summary contains any of those, regenerate it. Follow this exact pattern:
+"[Role] with [X]+ years of experience building web applications using [Tech1], [Tech2], and [Tech3]. Focused on [type of work]. [Optional: Background in X / work authorization]."
+
 Return JSON with "original" and "tailored" keys.`;
 
     const completion = await openai.chat.completions.create({
