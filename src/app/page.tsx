@@ -32,13 +32,31 @@ const PDFExport = dynamic(() => import("@/components/PDFExport"), {
 type Tab = "original" | "tailored";
 
 export default function Home() {
-  const [resumeText, setResumeText] = useState("");
-  const [jobDescription, setJobDescription] = useState("");
-  const [originalResume, setOriginalResume] = useState<Resume | null>(null);
-  const [tailoredResume, setTailoredResume] = useState<Resume | null>(null);
+  const [resumeText, setResumeText] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return sessionStorage.getItem("rt_resumeText") ?? "";
+  });
+  const [jobDescription, setJobDescription] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return sessionStorage.getItem("rt_jobDescription") ?? "";
+  });
+  const [originalResume, setOriginalResume] = useState<Resume | null>(() => {
+    if (typeof window === "undefined") return null;
+    try { return JSON.parse(sessionStorage.getItem("rt_original") ?? "null"); } catch { return null; }
+  });
+  const [tailoredResume, setTailoredResume] = useState<Resume | null>(() => {
+    if (typeof window === "undefined") return null;
+    try { return JSON.parse(sessionStorage.getItem("rt_tailored") ?? "null"); } catch { return null; }
+  });
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>("original");
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    if (typeof window === "undefined") return "original";
+    return (sessionStorage.getItem("rt_activeTab") as Tab) ?? "original";
+  });
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return sessionStorage.getItem("rt_fileName") ?? null;
+  });
   const [parsing, setParsing] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -55,7 +73,14 @@ export default function Home() {
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Persist only appearance settings across visits
+  // Persist resume data for this session (clears when tab/browser is closed)
+  useEffect(() => { sessionStorage.setItem("rt_resumeText", resumeText); }, [resumeText]);
+  useEffect(() => { sessionStorage.setItem("rt_jobDescription", jobDescription); }, [jobDescription]);
+  useEffect(() => { sessionStorage.setItem("rt_original", JSON.stringify(originalResume)); }, [originalResume]);
+  useEffect(() => { sessionStorage.setItem("rt_tailored", JSON.stringify(tailoredResume)); }, [tailoredResume]);
+  useEffect(() => { sessionStorage.setItem("rt_activeTab", activeTab); }, [activeTab]);
+  useEffect(() => { sessionStorage.setItem("rt_fileName", uploadedFileName ?? ""); }, [uploadedFileName]);
+  // Persist appearance settings permanently
   useEffect(() => {
     localStorage.setItem("rt_settings", JSON.stringify(settings));
   }, [settings]);
