@@ -18,9 +18,11 @@ const EDIT_SUGGESTIONS = [
 ];
 
 const CREATE_SUGGESTIONS = [
-  "I'm a frontend developer with 3 years of React experience",
-  "Help me build a resume from scratch",
-  "I just graduated in Computer Science",
+  "I want to create a new resume",
+  "Let me share my career background and skills",
+  "I want to add my education and work experience",
+  "Let's start with a short summary",
+  "Can you suggest a suitable resume template for me?",
 ];
 
 interface Props {
@@ -37,7 +39,10 @@ export default function ResumeChatPanel({ resume, onResumeUpdate }: Props) {
     "Hi! I can help you refine your resume. Try asking me to shorten the summary, reorder skills, rephrase bullet points, or anything else you'd like to tweak.";
 
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", content: isCreationMode ? creationGreeting : editGreeting },
+    {
+      role: "assistant",
+      content: isCreationMode ? creationGreeting : editGreeting,
+    },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,7 +50,10 @@ export default function ResumeChatPanel({ resume, onResumeUpdate }: Props) {
 
   useEffect(() => {
     setMessages([
-      { role: "assistant", content: isCreationMode ? creationGreeting : editGreeting },
+      {
+        role: "assistant",
+        content: isCreationMode ? creationGreeting : editGreeting,
+      },
     ]);
     setInput("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,7 +127,9 @@ export default function ResumeChatPanel({ resume, onResumeUpdate }: Props) {
           {isCreationMode ? "Build with AI Chat" : "Refine with AI Chat"}
         </span>
         {!isCreationMode && (
-          <span className="text-xs text-slate-500">— tweaks the Tailored tab</span>
+          <span className="text-xs text-slate-500">
+            — tweaks the Tailored tab
+          </span>
         )}
       </div>
 
